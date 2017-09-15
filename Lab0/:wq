@@ -1,0 +1,218 @@
+/*Lab #1
+ * Audaris Blades
+ * Program that parses a music library
+ */
+#include <string>
+#include <iostream>
+#include <map>
+#include <fstream>
+#include <stdlib.h>
+#include <sstream>
+#include <vector>
+#include <algorithm>
+#include <iomanip>
+
+using namespace std;
+
+class Song;
+class Artist;
+class Album;
+
+class Song{
+	public:
+		string title;
+		int time;
+		int track;
+
+		void timeToInt(string s){
+			bool colon = false;
+			string mm, ss;
+			int minutes, seconds;
+			
+			for(int i = 0; i < s.length(); i++){
+
+				if(colon == true)
+					ss += s[i];
+
+				if(s[i] == ':')
+					colon = true;
+
+				if(colon == false)
+					mm += s[i];
+			}
+//		cout <<"mm" << mm <<"ss"<< ss;
+		minutes = atoi(mm.c_str());
+		seconds = atoi(ss.c_str());
+//		cout <<"m" << minutes << "s" << seconds;
+		time = (minutes*60 + seconds);
+
+		}
+
+
+	
+};
+
+class Album{
+	public:
+		vector<Song> songs;
+		string name;
+		int time;
+		int nsongs;
+};
+
+class Artist{
+	public:
+		vector<Album> albums;
+		string name;
+		int time;
+};
+
+string toSpaces(string s){
+	for(int i = 0; i < s.length(); i++){
+		if(s[i] == '_')
+			s[i] = ' ';
+	}
+
+	return s;
+};
+
+string convertTime(int t){
+	stringstream s;
+	int mm = (t / 60);
+	int ss = t % 60;
+
+	s << mm << ':' << setfill('0') << setw(2)<< ss;
+
+	return s.str();
+
+};
+
+int main(int argc, char* argv[]){
+	ifstream file;
+	string inputFile = argv[1];
+	file.open(inputFile);
+	string cWord;
+
+	vector<Artist> artistList;
+	bool albumInList = false;
+	bool artistInList = false;
+
+	while(file >> cWord){
+		//Reset Values for every line parsed
+		Song cSong;
+		Album cAlbum;
+		Artist cArtist;
+		artistInList = false;
+		albumInList = false;
+	
+/*1*/	cSong.title = toSpaces(cWord);
+
+
+/*2*/	file >> cWord;
+
+		cSong.timeToInt(cWord);
+
+/*3*/	file >> cWord;
+		
+		//Look through artistList
+		for(int i = 0; i < artistList.size(); i++){
+			if(artistList[i].name == toSpaces(cWord)){
+				artistInList = true;
+				cArtist = artistList[i];
+				artistList.erase(artistList.begin() + i);
+			}
+		}
+		//Add Artist Name 
+		if(artistInList == false){
+			cArtist.name = toSpaces(cWord);
+		}
+		//Check for artist albums
+
+/*4*/	file >> cWord;
+		
+		//Check if Album exists
+		for(int i = 0; i < cArtist.albums.size(); i++){
+			if(cArtist.albums[i].name == toSpaces(cWord)){
+				cArtist.albums[i].songs.push_back(cSong);
+				cArtist.albums[i].nsongs += 1;
+				cArtist.albums[i].time += cSong.time;
+				albumInList = true;
+			}
+		}
+
+		//Add new album and add current song
+		if(albumInList == false){
+			cAlbum.name = toSpaces(cWord);
+			cAlbum.songs.push_back(cSong);
+			cAlbum.nsongs += 1;
+			cAlbum.time += cSong.time;
+			cArtist.albums.push_back(cAlbum);
+		}
+
+		//Skip Genre
+/*5*/	file >> cWord;
+
+/*6*/	file >> cWord;
+		
+		cSong.track = atoi(cWord.c_str());
+	
+		artistList.push_back(cArtist);
+		
+	}
+
+//Sorts list of artist
+	for(int i = 0, j = 1; j < artistList.size(); i++, j++){
+		if(artistList[i].name > artistList[j].name){
+			swap(artistList[i], artistList[j]);
+		}	
+	}
+	//Print
+	
+	for(int i = 0; i < artistList.size(); i++){
+	
+		int totalTime = 0;
+		//Sorts albums and adds total time of all albums
+		for(int a =0, b =1; a < artistList[i].albums.size(); a++, b++){
+			totalTime += artistList[i].albums[a].time;
+
+	//		if(artistList[i].albums[a].name > artistList[i].albums[b].name)
+	//			swap(artistList[i].albums[a],artistList[i].albums[b]);
+			
+		}
+
+		cout
+			<< artistList[i].name
+			<< ":"
+			<< (int) artistList[i].albums.size()
+			<< ", "
+			<< convertTime(totalTime)
+			<< endl;
+
+		for(int j = 0; j < artistList[i].albums.size(); j++){
+			cout
+				<< setfill(' ') << setw(8) << ""
+				<< artistList[i].albums[j].name
+				<<" "
+				<< artistList[i].albums[j].nsongs
+				<<", "
+				<< convertTime( artistList[i].albums[j].time)
+				<< endl;
+			
+			for(int k = 0; k < artistList[i].albums[j].songs.size(); k++){
+				cout
+					<<setw(16) << ""
+					<< artistList[i].albums[j].songs[k].track
+					<<". "
+					<< artistList[i].albums[j].songs[k].title
+					<<" "
+					<< convertTime(artistList[i].albums[j].songs[k].time);
+
+			}
+			cout << endl;
+		}
+		cout << endl;
+	}	
+
+}
+
+
