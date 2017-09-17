@@ -45,16 +45,16 @@ long long countValidGuesses(vector<int>  FP, vector<int>  SP){
 
 long long cvg(int v){
 
-	//Loop through FBMAP and assign high and low values
+	//Loop through FBMAP and assign high and low values to elements in SB
 	for(map<int, Ball*>::iterator it = FBMAP.begin(); it!= FBMAP.end(); it++){
 		//ball in current iteration
 		Ball *b = it->second;
 		//Find adjecent by v elements low and high
-		b->low = ((FBMAP.find(b->val - v))->second);
-		b->high = ((FBMAP.find(b->val + v))->second);
+		b->low = ((SBMAP.find(b->val - v))->second);
+		b->high = ((SBMAP.find(b->val + v))->second);
 	}
 
-	
+
 };
 
 
