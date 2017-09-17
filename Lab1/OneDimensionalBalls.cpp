@@ -28,7 +28,7 @@ long long countValidGuesses(vector<int>  FP, vector<int>  SP){
 		b->matched = 0;
 		b->low = NULL;
 		b->high = NULL;
-		FBMAP.insert(make_pair(FP[i], &cBall));
+		FBMAP.insert(make_pair(FP[i], b));
 	}
 
 	//Add Balls from secondPicture to SBMap
@@ -36,8 +36,8 @@ long long countValidGuesses(vector<int>  FP, vector<int>  SP){
 		Ball *b;
 		b->matched = 0;
 		b->low = NULL;
-		b->.high = NULL;
-		SBMAP.insert(make_pair(SP[i], &cBall));
+		b->high = NULL;
+		SBMAP.insert(make_pair(SP[i], b));
 	}
 	
 	return 0;
@@ -45,18 +45,21 @@ long long countValidGuesses(vector<int>  FP, vector<int>  SP){
 
 long long cvg(int v){
 
-	//Loop through FBMAP
-	for(map<int, Ball*>::iterator it = FBMAP.begin(); it! = FBMAP.end(); it++){
-		//Find  int -val and int +val in the current map
-		//set low and high accourdingly
-		Ball* b;
-		b->it.second;
-		b->low = (it.find(b.val - v)->second);
-		b->high = (it.find(b.val + v)->second);
+	//Loop through FBMAP and assign high and low values
+	for(map<int, Ball*>::iterator it = FBMAP.begin(); it!= FBMAP.end(); it++){
+		//ball in current iteration
+		Ball *b = it->second;
+		//Find adjecent by v elements low and high
+		b->low = ((FBMAP.find(b->val - v))->second);
+		b->high = ((FBMAP.find(b->val + v))->second);
 	}
+
+	
 };
+
+
 
 
 int main(){
 	return 0;
-}
+};
