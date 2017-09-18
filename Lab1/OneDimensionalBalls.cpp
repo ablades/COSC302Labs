@@ -3,6 +3,7 @@
 #include <vector>
 #include <set>
 #include <algorithm>
+#include <iostream>
 using namespace std;
 class Ball{
 	public:
@@ -21,38 +22,50 @@ class OneDimensionalBalls{
 		map<int, Ball*> FPMAP;
 		//Stores all balls in second picture
 		map<int, Ball*> SPMAP;
+		~OneDimensionalBalls(){
+			for(map<int, Ball*>::iterator it = FPMAP.begin(); it!= FPMAP.end(); it++)
+				delete it->second;
 
-		long long countValidGuesses(vector<int>  FP, vector<int>  SP){
-			long rv;
+			for(map<int, Ball*>::iterator it = SPMAP.begin(); it!= SPMAP.end(); it++)
+				delete it->second;
+
+		};
+
+		long countValidGuesses(vector<int>  firstPicture, vector<int>  secondPicture){
+			long rv = 0;
 			//Add Balls from firstPicture to FPMAP
-			for(int i = 0; i < FP.size(); i++){
+			FPMAP.clear();
+			SPMAP.clear();
+			for(int i = 0; i < firstPicture.size(); i++){
 				//Set Ball attributes
-				Ball *b;
+				Ball *b =  new Ball();
 				b->matched = 0;
+				b->val = firstPicture[i];
 				b->low = NULL;
 				b->high = NULL;
 				b->isFP = true;
 				b->inChain = false;
-				FPMAP.insert(make_pair(FP[i], b));
+				FPMAP.insert(make_pair(b->val, b));
 			}
 
 			//Add Balls from secondPicture to SPMAP
-			for(int i = 0; i < SP.size(); i++){
-				Ball *b;
+			for(int i = 0; i < secondPicture.size(); i++){
+				Ball *b = new Ball();
 				b->matched = 0;
+				b->val = secondPicture[i];
 				b->low = NULL;
 				b->high = NULL;
 				b->isFP = false;
 				b->inChain = false;
-				SPMAP.insert(make_pair(SP[i], b));
+				SPMAP.insert(make_pair(b->val, b));
 			}	
 			
 			//Sort potential Velocity values for the set
 			set<int> pVelcocities;
-			for(int i = 0; i < SP.size(); i++){
-				int vel = SP[i] - FP[0];
+			for(int i = 0; i < secondPicture.size(); i++){
+				int vel = secondPicture[i] - firstPicture[0];
 				vel = abs(vel);
-				if(vel != 0)
+				if(vel > 0)
 					pVelcocities.insert(vel);
 			}
 
@@ -64,13 +77,13 @@ class OneDimensionalBalls{
 		};
 
 		long long cvg(int v){
-
+			cout << "hello";
 			//Set Ball Pointers in FP
 			for(map<int, Ball*>::iterator it = FPMAP.begin(); it!= FPMAP.end(); it++){
 				//ball in current iteration
 				Ball *b = it->second;
 				map<int, Ball*>::iterator lowIt = SPMAP.find(b->val - v);
-				map<int, Ball*>::iterator highIt = SPMAP.find(b->val - v);
+				map<int, Ball*>::iterator highIt = SPMAP.find(b->val + v);
 				//If there is an adjecent ball set its pointer
 				if(lowIt != FPMAP.end())
 					b->low = lowIt->second;
@@ -85,7 +98,7 @@ class OneDimensionalBalls{
 				//ball in current iteration
 				Ball *b = it->second;
 				map<int, Ball*>::iterator lowIt = FPMAP.find(b->val - v);
-				map<int, Ball*>::iterator highIt = FPMAP.find(b->val - v);
+				map<int, Ball*>::iterator highIt = FPMAP.find(b->val + v);
 				//If there is an adjecent ball set its pointer
 				if(lowIt != SPMAP.end())
 					b->low = lowIt->second;
@@ -135,11 +148,15 @@ class OneDimensionalBalls{
 
 			//Check for balls without match
 			bool allMatched = true;
+			//Check for
 			for(map<int, Ball*>::iterator it = FPMAP.begin();it != FPMAP.end();it++){
 				Ball *b = it->second;
 
-				if(b->matched == 0 && b->high == NULL && b->low == NULL)
+				if((b->matched == 0) && (b->high == NULL) && (b->low == NULL)){
+					cout << "no matches remaining";
 					return 0;
+				}
+				
 				
 				if(b->matched == 0){
 					allMatched = false;
@@ -150,10 +167,18 @@ class OneDimensionalBalls{
 
 			if(allMatched)
 				return 1;
-
-			//Count the length of the chains
 			long rv = 0;
-			for(map<int, Ball*>::iterator it = FPMAP.begin(); it != FPMAP.end(); it++){
+
+			for_each(FPMAP.begin(), FPMAP.end(), [&] (std::pair<int, Ball*> pair) {
+				if(pair.second->matched == 0 && pair.second->low != NULL || pair.second->high != NULL) {
+					cout << "Ball in chain\n";
+					rv++;
+				}
+			});
+			//Count the length of the chains
+			//long rv = 0;
+
+			/*for(map<int, Ball*>::iterator it = FPMAP.begin(); it != FPMAP.end(); it++){
 				Ball *b = it->second;
 				long chainCount = 0;
 				while(b->high != NULL && b->inChain == false){
@@ -170,14 +195,10 @@ class OneDimensionalBalls{
 					rv += 1;
 					rv *= chainCount;
 				}
-			}
+			}*/
 			return rv;
 
 		};
 
-
-};
-
-int main(){
 
 };
