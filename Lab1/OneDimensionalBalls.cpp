@@ -22,22 +22,16 @@ class OneDimensionalBalls{
 		map<int, Ball*> FPMAP;
 		//Stores all balls in second picture
 		map<int, Ball*> SPMAP;
-		~OneDimensionalBalls(){
-			for(map<int, Ball*>::iterator it = FPMAP.begin(); it!= FPMAP.end(); it++)
-				delete it->second;
-
-			for(map<int, Ball*>::iterator it = SPMAP.begin(); it!= SPMAP.end(); it++)
-				delete it->second;
-
-		};
+	
 
 		long countValidGuesses(vector<int>  firstPicture, vector<int>  secondPicture){
 			long rv = 0;
-			//Add Balls from firstPicture to FPMAP
+			//reset maps
 			FPMAP.clear();
 			SPMAP.clear();
+			//Set ball attributes. Add to firstmap
 			for(int i = 0; i < firstPicture.size(); i++){
-				//Set Ball attributes
+				
 				Ball *b =  new Ball();
 				b->matched = 0;
 				b->val = firstPicture[i];
@@ -46,9 +40,10 @@ class OneDimensionalBalls{
 				b->isFP = true;
 				b->inChain = false;
 				FPMAP.insert(make_pair(b->val, b));
+				//cout << FPMAP.
 			}
 
-			//Add Balls from secondPicture to SPMAP
+			//Set ball attributes. Add to secondmap.
 			for(int i = 0; i < secondPicture.size(); i++){
 				Ball *b = new Ball();
 				b->matched = 0;
@@ -65,7 +60,8 @@ class OneDimensionalBalls{
 			for(int i = 0; i < secondPicture.size(); i++){
 				int vel = secondPicture[i] - firstPicture[0];
 				vel = abs(vel);
-				if(vel > 0)
+				
+				if(vel != 0)
 					pVelcocities.insert(vel);
 			}
 
@@ -77,19 +73,25 @@ class OneDimensionalBalls{
 		};
 
 		long long cvg(int v){
-			cout << "hello";
+			//cout << "hello";
+			long rv = 0;
 			//Set Ball Pointers in FP
 			for(map<int, Ball*>::iterator it = FPMAP.begin(); it!= FPMAP.end(); it++){
 				//ball in current iteration
 				Ball *b = it->second;
+				//cout << b->val;
 				map<int, Ball*>::iterator lowIt = SPMAP.find(b->val - v);
 				map<int, Ball*>::iterator highIt = SPMAP.find(b->val + v);
 				//If there is an adjecent ball set its pointer
 				if(lowIt != FPMAP.end())
 					b->low = lowIt->second;
+				else
+					b->low = NULL;
 
 				if(highIt != FPMAP.end())
 					b->high = highIt->second;
+				else 
+					b->low = NULL;
 				
 			}
 
@@ -99,50 +101,60 @@ class OneDimensionalBalls{
 				Ball *b = it->second;
 				map<int, Ball*>::iterator lowIt = FPMAP.find(b->val - v);
 				map<int, Ball*>::iterator highIt = FPMAP.find(b->val + v);
+
 				//If there is an adjecent ball set its pointer
 				if(lowIt != SPMAP.end())
 					b->low = lowIt->second;
+				else
+					b->low = NULL;
 
 				if(highIt != SPMAP.end())
 					b->high = highIt->second;
+				else
+					b->high = NULL;
 			}
 
 			//Check Map for No Matches
-			bool pMatch  = false;
+			bool pMatch = false;
+
 			for(map<int, Ball*>::iterator it = FPMAP.begin();it != FPMAP.end();it++){
 				Ball *b = it->second;
 				//There are no matches if there are no pointers!
-				if(b->low != NULL || b->high != NULL){
+				if(b->low != NULL || b->high != NULL)
 					pMatch = true;
-					break;
-				}
 			}
 
-			if(!pMatch)
-				return 0;
+			if(pMatch == false)
+				return rv;
 
 				//Check all balls in FP again If any ball has 1 low or high only one way to match 
 			for(map<int, Ball*>::iterator it = FPMAP.begin();it != FPMAP.end();it++){
 				Ball *b = it->second;
 				//There are no matches if there are no pointers!
 				//Exclusive or check
-				if((b->low == NULL) != (b->high == NULL)){
+				if((b->low == NULL) ^ (b->high == NULL)){
 					b->matched = 1;
 					//temp pointer points to child ball to change values;
 					Ball *childBall = (b->low != NULL) ? (childBall = b->low) : (childBall = b->high);
 					childBall->matched = 1;
 
 					//set proper high/lowpointer
-					if(childBall->val < b->val)
+					if(childBall->val < b->val){
 						childBall->low = NULL;
-					else
+						b->high = NULL;
+						if(b->low != NULL){
+							b->low->high = NULL;
+							b->low = NULL;
+						}
+					}
+					else{
 						childBall->high = NULL;
-
-					//Dereference the childBall
-					childBall = NULL;
-
-
-
+						b->low = NULL;
+						if(b->high != NULL){
+							b->high->low = NULL;
+							b->high = NULL;
+						}
+					}
 				}
 			}
 
@@ -153,49 +165,30 @@ class OneDimensionalBalls{
 				Ball *b = it->second;
 
 				if((b->matched == 0) && (b->high == NULL) && (b->low == NULL)){
-					cout << "no matches remaining";
-					return 0;
+					//cout << "no matches remaining";
+					return rv;
 				}
 				
 				
 				if(b->matched == 0){
 					allMatched = false;
-					break;
 				}
 
 			}
 
 			if(allMatched)
-				return 1;
-			long rv = 0;
+				return rv++;
 
-			for_each(FPMAP.begin(), FPMAP.end(), [&] (std::pair<int, Ball*> pair) {
-				if(pair.second->matched == 0 && pair.second->low != NULL || pair.second->high != NULL) {
-					cout << "Ball in chain\n";
-					rv++;
-				}
-			});
+			
+			
 			//Count the length of the chains
 			//long rv = 0;
 
-			/*for(map<int, Ball*>::iterator it = FPMAP.begin(); it != FPMAP.end(); it++){
+			for(map<int, Ball*>::iterator it = FPMAP.begin(); it != FPMAP.end(); it++){
 				Ball *b = it->second;
-				long chainCount = 0;
-				while(b->high != NULL && b->inChain == false){
-					
-					if(b->isFP == true){
-						chainCount++;
-						b->inChain = true;
-					}
-
-					b = b->high;
-				}
-
-				if(chainCount != 0){
-					rv += 1;
-					rv *= chainCount;
-				}
-			}*/
+				if((b->matched == 0) && (b->low != NULL || b->high != NULL))
+					rv++;
+			}
 			return rv;
 
 		};
