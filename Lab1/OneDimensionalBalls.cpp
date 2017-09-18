@@ -12,101 +12,113 @@ class Ball{
 		Ball *high;
 };
 
+class OneDimensionalBalls{
+	public:
+		//Easy iteration over balls
+		//Stores all balls in first picture
+		map<int, Ball*> FPMAP;
+		//Stores all balls in second picture
+		map<int, Ball*> SPMAP;
 
-//Easy iteration over balls
-//Stores all balls in first picture
-map<int, Ball*> FBMAP;
-//Stores all balls in second picture
-map<int, Ball*> SBMAP;
+		long long countValidGuesses(vector<int>  FP, vector<int>  SP){
 
-long long countValidGuesses(vector<int>  FP, vector<int>  SP){
+			//Add Balls from firstPicture to FPMAP
+			for(int i = 0; i < FP.size(); i++){
+				//Set Ball attributes
+				Ball *b;
+				b->matched = 0;
+				b->low = NULL;
+				b->high = NULL;
+				FPMAP.insert(make_pair(FP[i], b));
+			}
 
-	//Add Balls from firstPicture to FBMap
-	for(int i = 0; i < FP.size(); i++){
-		//Set Ball attributes
-		Ball *b;
-		b->matched = 0;
-		b->low = NULL;
-		b->high = NULL;
-		FBMAP.insert(make_pair(FP[i], b));
-	}
-
-	//Add Balls from secondPicture to SBMap
-	for(int i = 0; i < SP.size(); i++){
-		Ball *b;
-		b->matched = 0;
-		b->low = NULL;
-		b->high = NULL;
-		SBMAP.insert(make_pair(SP[i], b));
-	}
-	
-	return 0;
-};
-
-long long cvg(int v){
-
-	//Loop through FBMAP and assign high and low values to elements in SB
-	for(map<int, Ball*>::iterator it = FBMAP.begin(); it!= FBMAP.end(); it++){
-		//ball in current iteration
-		Ball *b = it->second;
-		//Find adjecent by v elements low and high
-		b->low = ((SBMAP.find(b->val - v))->second);
-		b->high = ((SBMAP.find(b->val + v))->second);
-	}
-
-	//Loop through FSBMAP and assign high and low values to elements in FB
-	for(map<int, Ball*>::iterator it = SBMAP.begin(); it!= SBMAP.end(); it++){
-		//ball in current iteration
-		Ball *b = it->second;
-		//Find adjecent by v elements low and high
-		b->low = ((FBMAP.find(b->val - v))->second);
-		b->high = ((FBMAP.find(b->val + v))->second);
-	}
-
-	//Check all balls in FP If no valid low or high pointer return zero (no guesses)
-	for(map<int, Ball*>::iterator it = FBMAP.begin();it != FBMAP.end();it++){
-		Ball *b = it->second;
-		//There are no matches if there are no pointers!
-		if(b->low == NULL && b->high == NULL)
+			//Add Balls from secondPicture to SPMAP
+			for(int i = 0; i < SP.size(); i++){
+				Ball *b;
+				b->matched = 0;
+				b->low = NULL;
+				b->high = NULL;
+				SPMAP.insert(make_pair(SP[i], b));
+			}	
+			
 			return 0;
+		};
 
-	}	//Check all balls in FP again If any ball has 1 low or high only one way to match 
-	for(map<int, Ball*>::iterator it = FBMAP.begin();it != FBMAP.end();it++){
-		Ball *b = it->second;
-		//There are no matches if there are no pointers!
-		//Exclusive or check
-		if((b->low == NULL) != (b->high == NULL)){
-			b->matched = 1;
-			//temp pointer points to child ball to change values;
-			Ball *childBall;
-			if(b->low != NULL)
-				childBall = b->low;
-			else
-				childBall = b->high;
+		long long cvg(int v){
 
-			childBall->matched = 1;
+			//Loop through FPMAP and assign high and low values to elements in SB
+			for(map<int, Ball*>::iterator it = FPMAP.begin(); it!= FPMAP.end(); it++){
+				//ball in current iteration
+				Ball *b = it->second;
+				map<int, Ball*>::iterator lowIt = SPMAP.find(b->val - v);
+				map<int, Ball*>::iterator highIt = SPMAP.find(b->val - v);
+				//If there is an adjecent ball set its pointer
+				if(lowIt != FPMAP.end())
+					b->low = lowIt->second;
 
-			//set proper high/lowpointer
-			if(childBall->val < b->val)
-				childBall->low = NULL;
-			else
-				childBall->high = NULL;
+				if(highIt != FPMAP.end())
+					b->high = highIt->second;
+				
+			}
 
-			//Dereference the childBall
-			childBall = NULL;
+			//Loop through FSPMAP and assign high and low values to elements in FB
+			for(map<int, Ball*>::iterator it = SPMAP.begin(); it!= SPMAP.end(); it++){
+				//ball in current iteration
+				Ball *b = it->second;
+				map<int, Ball*>::iterator lowIt = FPMAP.find(b->val - v);
+				map<int, Ball*>::iterator highIt = FPMAP.find(b->val - v);
+				//If there is an adjecent ball set its pointer
+				if(lowIt != SPMAP.end())
+					b->low = lowIt->second;
+
+				if(highIt != SPMAP.end())
+					b->high = highIt->second;
+			}
+
+			//Check all balls in FP If no valid low or high pointer return zero (no guesses)
+			for(map<int, Ball*>::iterator it = FPMAP.begin();it != FPMAP.end();it++){
+				Ball *b = it->second;
+				//There are no matches if there are no pointers!
+				if(b->low == NULL && b->high == NULL)
+					return 0;
+
+			}	//Check all balls in FP again If any ball has 1 low or high only one way to match 
+			for(map<int, Ball*>::iterator it = FPMAP.begin();it != FPMAP.end();it++){
+				Ball *b = it->second;
+				//There are no matches if there are no pointers!
+				//Exclusive or check
+				if((b->low == NULL) != (b->high == NULL)){
+					b->matched = 1;
+					//temp pointer points to child ball to change values;
+					Ball *childBall = (b->low != NULL) ? (childBall = b->low) : (childBall = b->high);
+					childBall->matched = 1;
+
+					//set proper high/lowpointer
+					if(childBall->val < b->val)
+						childBall->low = NULL;
+					else
+						childBall->high = NULL;
+
+					//Dereference the childBall
+					childBall = NULL;
 
 
 
-		}
-	}
+				}
+			}
 
-	//set matched filed that it point to in sb to 1 set appropriate low and high to null for each ball
+			//set matched filed that it point to in sb to 1 set appropriate low and high to null for each ball
+
+		};
+
+
+		int countChains(){
+
+
+		};
 
 };
-
-
-
 
 int main(){
-	return 0;
+
 };
