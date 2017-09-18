@@ -10,6 +10,8 @@ class Ball{
 		int matched;
 		Ball *low;
 		Ball *high;
+		bool isFP;
+		bool inChain;
 };
 
 class OneDimensionalBalls{
@@ -29,6 +31,8 @@ class OneDimensionalBalls{
 				b->matched = 0;
 				b->low = NULL;
 				b->high = NULL;
+				b->isFP = true;
+				b->inChain = false;
 				FPMAP.insert(make_pair(FP[i], b));
 			}
 
@@ -38,6 +42,8 @@ class OneDimensionalBalls{
 				b->matched = 0;
 				b->low = NULL;
 				b->high = NULL;
+				b->isFP = false;
+				b->inChain = false;
 				SPMAP.insert(make_pair(SP[i], b));
 			}	
 			
@@ -59,7 +65,7 @@ class OneDimensionalBalls{
 
 		long long cvg(int v){
 
-			//Loop through FPMAP and assign high and low values to elements in SB
+			//Set Ball Pointers in FP
 			for(map<int, Ball*>::iterator it = FPMAP.begin(); it!= FPMAP.end(); it++){
 				//ball in current iteration
 				Ball *b = it->second;
@@ -74,7 +80,7 @@ class OneDimensionalBalls{
 				
 			}
 
-			//Loop through FSPMAP and assign high and low values to elements in FB
+			//Set Ball Pointers in SP
 			for(map<int, Ball*>::iterator it = SPMAP.begin(); it!= SPMAP.end(); it++){
 				//ball in current iteration
 				Ball *b = it->second;
@@ -88,15 +94,21 @@ class OneDimensionalBalls{
 					b->high = highIt->second;
 			}
 
-			//Check all balls in FP If no valid low or high pointer return zero (no guesses)
+			//Check Map for No Matches
+			bool pMatch  = false;
 			for(map<int, Ball*>::iterator it = FPMAP.begin();it != FPMAP.end();it++){
 				Ball *b = it->second;
 				//There are no matches if there are no pointers!
-				if(b->low != NULL || b->high != NULL);
-				else 
-					return 0;
+				if(b->low != NULL || b->high != NULL){
+					pMatch = true;
+					break;
+				}
+			}
 
-			}	//Check all balls in FP again If any ball has 1 low or high only one way to match 
+			if(!pMatch)
+				return 0;
+
+				//Check all balls in FP again If any ball has 1 low or high only one way to match 
 			for(map<int, Ball*>::iterator it = FPMAP.begin();it != FPMAP.end();it++){
 				Ball *b = it->second;
 				//There are no matches if there are no pointers!
@@ -121,15 +133,48 @@ class OneDimensionalBalls{
 				}
 			}
 
-			//set matched filed that it point to in sb to 1 set appropriate low and high to null for each ball
+			//Check for balls without match
+			bool allMatched = true;
+			for(map<int, Ball*>::iterator it = FPMAP.begin();it != FPMAP.end();it++){
+				Ball *b = it->second;
+
+				if(b->matched == 0 && b->high == NULL && b->low == NULL)
+					return 0;
+				
+				if(b->matched == 0){
+					allMatched = false;
+					break;
+				}
+
+			}
+
+			if(allMatched)
+				return 1;
+
+			//Count the length of the chains
+			long rv = 0;
+			for(map<int, Ball*>::iterator it = FPMAP.begin(); it != FPMAP.end(); it++){
+				Ball *b = it->second;
+				long chainCount = 0;
+				while(b->high != NULL && b->inChain == false){
+					
+					if(b->isFP == true){
+						chainCount++;
+						b->inChain = true;
+					}
+
+					b = b->high;
+				}
+
+				if(chainCount != 0){
+					rv += 1;
+					rv *= chainCount;
+				}
+			}
+			return rv;
 
 		};
 
-
-		int countChains(){
-
-
-		};
 
 };
 
