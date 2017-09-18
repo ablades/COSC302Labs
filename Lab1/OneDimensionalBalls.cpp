@@ -21,7 +21,7 @@ class OneDimensionalBalls{
 		map<int, Ball*> SPMAP;
 
 		long long countValidGuesses(vector<int>  FP, vector<int>  SP){
-
+			long rv;
 			//Add Balls from firstPicture to FPMAP
 			for(int i = 0; i < FP.size(); i++){
 				//Set Ball attributes
@@ -41,7 +41,20 @@ class OneDimensionalBalls{
 				SPMAP.insert(make_pair(SP[i], b));
 			}	
 			
-			return 0;
+			//Sort potential Velocity values for the set
+			set<int> pVelcocities;
+			for(int i = 0; i < SP.size(); i++){
+				int vel = SP[i] - FP[0];
+				vel = abs(vel);
+				if(vel != 0)
+					pVelcocities.insert(vel);
+			}
+
+			for(set<int>::iterator it = pVelcocities.begin(); it != pVelcocities.end(); it++)
+				rv += cvg(*it);
+
+			return rv;
+
 		};
 
 		long long cvg(int v){
@@ -79,7 +92,8 @@ class OneDimensionalBalls{
 			for(map<int, Ball*>::iterator it = FPMAP.begin();it != FPMAP.end();it++){
 				Ball *b = it->second;
 				//There are no matches if there are no pointers!
-				if(b->low == NULL && b->high == NULL)
+				if(b->low != NULL || b->high != NULL);
+				else 
 					return 0;
 
 			}	//Check all balls in FP again If any ball has 1 low or high only one way to match 
