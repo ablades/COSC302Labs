@@ -32,8 +32,12 @@ void CS302_Midi::el_to_nd()
 
   //Loop through EventList
   for(list<Event *>::iterator it = EventList.begin(),it != EventList.end(); it++){
+  	Event * event = it;
 
+  	//Event is on
+  	if(event->key == 'O'){
 
+  	}
   }
 }
 
