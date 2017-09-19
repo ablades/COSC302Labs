@@ -182,16 +182,36 @@ class OneDimensionalBalls{
 			
 			
 			//Count the length of the chains
-			//long rv = 0;
+	
+    long ct;
+    rv = 1;
+    bool check = false;
+    for (map<int, Ball*>::iterator it=FPMAP.begin(); it!=FPMAP.end();){
+        if (it->second->matched == 0 && it->second->low->low == NULL && it->second->low != NULL && it->second->high != NULL){
+            check = true;
+            //begin count
+            ct = 0;
+            Ball* b = it->second;
+            while(b->high!=NULL && b->matched == 0){
+                ct++;
+                b->matched = 1;
+                if(b->high==NULL)
+                    break;
+                b->low = NULL;
+                b = b->high;
+            }
 
-			for(map<int, Ball*>::iterator it = FPMAP.begin(); it != FPMAP.end(); it++){
-				Ball *b = it->second;
-				if((b->matched == 0) && (b->low != NULL || b->high != NULL))
-					rv++;
-			}
-			return rv;
-
-		};
+            ct/=2;
+            ct+=2;
+            rv*=ct;
+            it = FPMAP.begin();
+        } 
+        else 
+            it++;
+        
+    }
+    return rv;
+	};
 
 
 };
