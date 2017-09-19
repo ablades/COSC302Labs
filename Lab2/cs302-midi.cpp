@@ -1,5 +1,5 @@
 /*Audaris Blades
-Lab2
+Lab3
 Convert MIDI Event/Note Files
 */
 
@@ -36,8 +36,22 @@ void CS302_Midi::el_to_nd()
 
   	//Event is on
   	if(event->key == 'O'){
+      //Create ND
+      //Set ND Start time
 
   	}
+    //Event is off
+    if(event->key == 'F'){
+      // Set stop time
+      //Insert into ND
+    }
+
+    //DamperDown Event
+    if(event->key == 'D'){
+
+    }
+
+    //DamperUpEvent
   }
 }
 
