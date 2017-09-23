@@ -20,6 +20,7 @@ void CS302_Midi::el_to_nd()
 {
   nd = new NDMap;
   
+  //Holds Note Damper Events
   //Indexed by pitch
   vector<ND*> tmp;
   
@@ -29,15 +30,21 @@ void CS302_Midi::el_to_nd()
   //Set Vector Values to NULL
   for(vector<ND*>::iterator it = tmp.begin(); it != tmp.end(); it++)
   		tmp.insert(it, NULL);
-
+	
   //Loop through EventList
   for(list<Event *>::iterator it = EventList.begin(),it != EventList.end(); it++){
-  	Event * event = it;
-
-  	//Event is on
+  	//Current event in the iteration
+	Event * event = it;
+	//Keeps track of the total time to insert into ND
+	double timeSinceStart += event->time;
+  	//Encountered On Event
   	if(event->key == 'O'){
+		
       //Create ND
+	  ND note = new ND();
       //Set ND Start time
+	  //Time since last event
+	  note->start = timeSinceStart;
 
   	}
     //Event is off
