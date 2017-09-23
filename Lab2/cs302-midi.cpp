@@ -52,6 +52,8 @@ void CS302_Midi::el_to_nd()
 	  note.pitch = event->v1;
 	  //value of volume
 	  note.volume = event->v2;
+	  //Add key to note
+	  note.key = 'N';
 	  //Store note based off pitch(index)
 	  tmp[note.pitch]->note;
 
@@ -59,10 +61,16 @@ void CS302_Midi::el_to_nd()
 
 
   	}
-    //Event is off
+    //Enocountered OFF Event
     if(event->key == 'F'){
+		//Get from ND tmp vector
+		ND* note;
+		note->tmp[event->pitch];
       // Set stop time
+		note->stop = timeSinceStart;
       //Insert into ND
+		nd.insert(std::pair<double, ND*>(note->start, *note));
+
     }
 
     //DamperDown Event
