@@ -30,21 +30,33 @@ void CS302_Midi::el_to_nd()
   //Set Vector Values to NULL
   for(vector<ND*>::iterator it = tmp.begin(); it != tmp.end(); it++)
   		tmp.insert(it, NULL);
-	
+
+	//Keeps track of the total time to insert into ND
+	double timeSinceStart = 0;
+ 
   //Loop through EventList
   for(list<Event *>::iterator it = EventList.begin(),it != EventList.end(); it++){
   	//Current event in the iteration
+	
 	Event * event = it;
-	//Keeps track of the total time to insert into ND
-	double timeSinceStart += event->time;
-  	//Encountered On Event
-  	if(event->key == 'O'){
-		
+	//Converts time and adds it to timeSinceStart
+	timeSinceStart += (event->time * 480);
+
+ 	//Encountered On Event
+  	if(event->key == 'O'){	
       //Create ND
 	  ND note = new ND();
-      //Set ND Start time
-	  //Time since last event
-	  note->start = timeSinceStart;
+	  //Stores time relative to total time
+	  note.start = timeSinceStart;
+	  //value of pitch
+	  note.pitch = event->v1;
+	  //value of volume
+	  note.volume = event->v2;
+	  //Store note based off pitch(index)
+	  tmp[note.pitch]->note;
+
+
+
 
   	}
     //Event is off
