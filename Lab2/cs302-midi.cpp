@@ -89,7 +89,7 @@ void CS302_Midi::el_to_nd()
 			//damper = NULL;
 			//test
 		}
-	  }
+	}
 }
 
 void CS302_Midi::nd_to_el()
@@ -98,11 +98,11 @@ void CS302_Midi::nd_to_el()
 	enum eventType {OFF, ON, DU , DD};
   	el = new EventList;
   	//Temp map to store contents of nd
- 	multimap <int, Event *, less<int>()> tmp;
-	map<int, multimap <int, Event *> >;
+	map<int, multimap <int, Event *> > mtmp;
   	for(std::iterator ndit = nd.begin(); it != nd.end(); ndit++){
 		ND *note = NULL;
-		note = *ndit;
+		note = ndit->second;
+
 		Event *onEvent = NULL;
 		Event *offEvent = NULL;
 		//Dealing with a note
@@ -114,13 +114,15 @@ void CS302_Midi::nd_to_el()
 			onEvent->key = 'O';
 			onEvent->v2 = note->volume;
 			onEvent->v1 = note->pitch;
-			tmp.insert(std::pair<int, Event *>(ON, onEvent));
+			onEvent->time = rint(note->stop);
+			mtmp[onEvent->time].insert(std::pair<int, Event *>(ON, onEvent));
 			//Create Off Event
 			Event* offEvent = NULL;
 			offEvent = new Event;
 			offEvent->key = 'F'
 			offEvent->v1 = note->pitch;
-			tmp.insert(std::pair<int, Event *>(OFF, offEvent));
+			offEvent->time = rint(note->stop);
+			mtmp[offEvent->time].insert(std::pair<int, Event *>(OFF, offEvent));
 			//Fill in information
 		}
 		//Dealing with a damper
@@ -130,18 +132,17 @@ void CS302_Midi::nd_to_el()
 			dd = new Event;
 			dd->key = 'D';
 			dd->v1 = 1;
-			tmp.insert(std::pair<int, Event *>(DD, dd));
+			dd->time = rint(note->start);
+			mtmp[dd->time].insert(std::pair<int, Event *>(DD, dd));
 			//Create new DamperUp
 			Event* du = NULL;
 			du = new Event;
 			du->key = 'D';
 			du->v1 = 0;
+			dd->time = rint(note->stop);
 			//Fill in info
-			tmp.insert(std::pair<int, Event *>(DU, du));
+			mtmp[dd->time].insert(std::pair<int, Event *>(DU, du));
 
 		}
-
-		//Iterate over the multimap and insert based on start time into the normal map
 	}
-
 }
