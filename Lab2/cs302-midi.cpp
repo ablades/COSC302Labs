@@ -33,14 +33,14 @@ void CS302_Midi::el_to_nd()
 
 	//Keeps track of the total time to insert into ND
 	double timeSinceStart = 0;
- 
+	ND Damper;
   //Loop through EventList
   for(list<Event *>::iterator it = EventList.begin(),it != EventList.end(); it++){
   	//Current event in the iteration
 	
 	Event * event = it;
 	//Converts time and adds it to timeSinceStart
-	timeSinceStart += (event->time * 480);
+	timeSinceStart += (event->time/480.0);
 
  	//Encountered On Event
   	if(event->key == 'O'){	
@@ -70,15 +70,23 @@ void CS302_Midi::el_to_nd()
 		note->stop = timeSinceStart;
       //Insert into ND
 		nd.insert(std::pair<double, ND*>(note->start, *note));
-
+		//Set location in temp vector to NULL
+		tmp[event->pitch] = NULL;
     }
 
     //DamperDown Event
-    if(event->key == 'D'){
-
+    if(event->key == 'D' && event->v1 == 1){
+		 damper = new ND();
+		 damper.key = 'D';
+		 damper.start = timeSinceStart;
     }
 
-    //DamperUpEvent
+    //DamperUp Event 
+	if(event->key == 'D' && event->v1 == 0){
+		damper.stop = timeSinceStart;
+		nd.insert(std::pair<double, ND*>(damper.start, *damper));
+		damper = NULL;
+	}
   }
 }
 
