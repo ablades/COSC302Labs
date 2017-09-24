@@ -1,6 +1,7 @@
 /*Audaris Blades
 Lab3
-Convert MIDI Event/Note Files
+Data Manipulation
+Convert EventFiles<->Note Files
 */
 
 #include <iostream>
@@ -126,7 +127,7 @@ void CS302_Midi::nd_to_el()
 	Event *event = NULL;
 	bool timeSet = false;
 	int previousTime = 0;
-
+	
 	for(std::map<int, multimap<int, Event *> >::iterator mit = tmp.begin(); mit != tmp.end(); mit++){
 		timeSet = false;
 		for(std::multimap<int, Event*>::iterator mmit = mit->second.begin(); mmit != mit->second.end(); mmit++){
