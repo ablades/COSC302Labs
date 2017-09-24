@@ -99,7 +99,7 @@ void CS302_Midi::nd_to_el()
   	el = new EventList;
   	//Temp map to store contents of nd
 	
-	map<int, multimap<int, Event *> >tmp;
+	map<double, multimap<int, Event *> >tmp;
 	Event* du = NULL;
 	ND *note = NULL;
 	Event* onEvent = NULL;
@@ -116,13 +116,14 @@ void CS302_Midi::nd_to_el()
 			onEvent->key = 'O';
 			onEvent->v2 = note->volume;
 			onEvent->v1 = note->pitch;
-			onEvent->time = rint(note->stop * 480);
+			onEvent->time = rint(note->start*480);
 			tmp[onEvent->time].insert(pair<int, Event *>(ON,onEvent));
 			//Create Off Event
 			offEvent = new Event;
 			offEvent->key = 'F';
 			offEvent->v1 = note->pitch;
-			offEvent->time = rint(note->stop * 480);
+			offEvent->time = rint(note->stop*480);
+
 			//Fill in information
 			tmp[offEvent->time].insert(pair<int, Event *>(OFF,offEvent));
 		}
@@ -132,14 +133,13 @@ void CS302_Midi::nd_to_el()
 			dd = new Event;
 			dd->key = 'D';
 			dd->v1 = 1;
-			dd->time = rint(note->start * 480);
-			cout << dd->time;
+			dd->time = rint(note->start*480);
 			tmp[dd->time].insert(pair<int, Event *>(DD, dd));
 			//Create new DamperUp
 			du = new Event;
 			du->key = 'D';
 			du->v1 = 0;
-			du->time = rint(note->stop * 480);
+			du->time = rint(note->stop*480);
 			//Fill in info
 			tmp[du->time].insert(pair<int, Event *>(DU, du));
 
@@ -150,10 +150,12 @@ void CS302_Midi::nd_to_el()
 	//MAP IS SORTED BY THE TIME IN WHICH EVENTS OCCUR ABSOLUTELY
 	//Iterates through the map
 	Event *event = NULL;
-	for(std::map<int, multimap<int, Event *> >::iterator mit = tmp.begin(); mit != tmp.end(); mit++){
+	int previousTime = 0;
+	bool timeSet = false;
+	for(std::map<double, multimap<int, Event *> >::iterator mit = tmp.begin(); mit != tmp.end(); mit++){
 		//Creates reference to the multimap at each time
 		//Iterates through the Multimap starting from second unit
-		bool timeSet = false;
+		timeSet = false;
 		for(std::multimap<int, Event*>::iterator mmit = mit->second.begin(); mmit != mit->second.end(); mmit++){
 			event = NULL;
 			event = mmit->second;
@@ -163,8 +165,9 @@ void CS302_Midi::nd_to_el()
 				//The current absolute time
 				int currentTime = mit->first;
 				
-				event->time = currentTime ;
+				event->time = currentTime - previousTime;
 				timeSet = true;
+				previousTime = currentTime;
 			}
 			else
 				event->time = 0;
