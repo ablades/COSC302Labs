@@ -114,14 +114,14 @@ void CS302_Midi::nd_to_el()
 			onEvent->key = 'O';
 			onEvent->v2 = note->volume;
 			onEvent->v1 = note->pitch;
-			onEvent->time = rint(note->stop);
+			onEvent->time = rint(note->stop * 480);
 			mtmp[onEvent->time].insert(std::pair<int, Event *>(ON, onEvent));
 			//Create Off Event
 			Event* offEvent = NULL;
 			offEvent = new Event;
 			offEvent->key = 'F'
 			offEvent->v1 = note->pitch;
-			offEvent->time = rint(note->stop);
+			offEvent->time = rint(note->stop * 480);
 			mtmp[offEvent->time].insert(std::pair<int, Event *>(OFF, offEvent));
 			//Fill in information
 		}
@@ -132,16 +132,45 @@ void CS302_Midi::nd_to_el()
 			dd = new Event;
 			dd->key = 'D';
 			dd->v1 = 1;
-			dd->time = rint(note->start);
+			dd->time = rint(note->start * 480);
 			mtmp[dd->time].insert(std::pair<int, Event *>(DD, dd));
 			//Create new DamperUp
 			Event* du = NULL;
 			du = new Event;
 			du->key = 'D';
 			du->v1 = 0;
-			dd->time = rint(note->stop);
+			dd->time = rint(note->stop * 480);
 			//Fill in info
 			mtmp[dd->time].insert(std::pair<int, Event *>(DU, du));
+
+		}
+	}
+
+	//MAP IS SORTED BY THE TIME IN WHICH EVENTS OCCUR ABSOLUTELY
+	//Iterates through the map
+	for(std::iterator mit = mtmp.begin(); mit != mtmp.end(); mit++){
+		//Creates reference to the multimap at each time
+		multimap<int, Event*> mm = mit->second;
+		//Iterates through the Multimap starting from second unit
+		bool timeSet = false;
+		for(std::iterator mmit = mm.begin(); mmit != mm.end(); mit++){
+			Event *event = NULL;
+			event = mmit->second;
+			
+			//set time of inital event if iterator
+			if(timeSet == false && (mit - 1) != mtmp.end()){
+				//The current absolute time
+				int currentTime = mit->first;
+				int previousTime = (mit - 1)->first;
+				event->time = currentTime - previousTime;
+				timeSet = true;
+			}
+
+			//Events in same map occur at same time
+			event->time = 0;
+			//Convert the time
+			
+			//Push to EL
 
 		}
 	}
