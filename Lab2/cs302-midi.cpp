@@ -86,6 +86,7 @@ void CS302_Midi::el_to_nd()
 		damper.stop = timeSinceStart;
 		nd.insert(std::pair<double, ND*>(damper.start, *damper));
 		damper = NULL;
+		//test
 	}
   }
 }
