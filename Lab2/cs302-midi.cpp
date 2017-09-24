@@ -25,9 +25,9 @@ void CS302_Midi::el_to_nd()
   vector<ND*> tmp(128);
   
   //Create Vector of size 128
-  ND* note = NULL;
+  ND *note = NULL;
   Event *event = NULL;
-  ND* damper = NULL;
+  ND *damper = NULL;
   //Set Vector Values to NULL
 
 	//Keeps track of the total time to insert into ND
