@@ -33,29 +33,28 @@ void CS302_Midi::el_to_nd()
 
 	//Keeps track of the total time to insert into ND
 	double timeSinceStart = 0;
-	ND Damper;
+
   //Loop through EventList
   for(EventList::iterator it = el->begin(); it != el->end(); it++){
   	//Current event in the iteration
-	
-	Event * event = it;
+	Event *event = *it;
 	//Converts time and adds it to timeSinceStart
 	timeSinceStart += (event->time/480.0);
 
  	//Encountered On Event
   	if(event->key == 'O'){	
       //Create ND
-	  ND note = new ND();
+	  ND* note = new ND();
 	  //Stores time relative to total time
-	  note.start = timeSinceStart;
+	  note->start = timeSinceStart;
 	  //value of pitch
-	  note.pitch = event->v1;
+	  note->pitch = event->v1;
 	  //value of volume
-	  note.volume = event->v2;
+	  note->volume = event->v2;
 	  //Add key to note
-	  note.key = 'N';
+	  note->key = 'N';
 	  //Store note based off pitch(index)
-	  tmp[note.pitch]->note;
+	  tmp[note->pitch] = note;
 
 
 
@@ -65,26 +64,28 @@ void CS302_Midi::el_to_nd()
     if(event->key == 'F'){
 		//Get from ND tmp vector
 		ND* note;
-		note->tmp[event->pitch];
+		note = tmp[event->v1];
       // Set stop time
 		note->stop = timeSinceStart;
       //Insert into ND
-		nd.insert(std::pair<double, ND*>(note->start, *note));
+		nd->insert(std::pair<double, ND*>(note->start, note));
 		//Set location in temp vector to NULL
-		tmp[event->pitch] = NULL;
+		tmp[event->v1] = NULL;
     }
 
     //DamperDown Event
     if(event->key == 'D' && event->v1 == 1){
-		 damper = new ND();
-		 damper.key = 'D';
-		 damper.start = timeSinceStart;
+		 ND* damper = new ND();
+		 damper->key = 'D';
+		 damper->start = timeSinceStart;
+		 tmp[0] = damper;
     }
 
     //DamperUp Event 
 	if(event->key == 'D' && event->v1 == 0){
-		damper.stop = timeSinceStart;
-		nd.insert(std::pair<double, ND*>(damper.start, *damper));
+		ND* damper = tmp[0];
+		damper->stop = timeSinceStart;
+		nd->insert(std::pair<double, ND*>(damper->start, damper));
 		damper = NULL;
 		//test
 	}
