@@ -12,7 +12,7 @@ Convert MIDI Event/Note Files
 #include <cstdlib>
 #include <cstdio>
 #include "cs302-midi.h"
-using namespace std;
+
 
 //EL is Full
 //Map is empty
@@ -35,7 +35,7 @@ void CS302_Midi::el_to_nd()
 	double timeSinceStart = 0;
 	ND Damper;
   //Loop through EventList
-  for(list<Event *>::iterator it = EventList.begin(),it != EventList.end(); it++){
+  for(EventList::iterator it = el->begin(); it != el->end(); it++){
   	//Current event in the iteration
 	
 	Event * event = it;
