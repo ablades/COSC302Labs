@@ -96,4 +96,39 @@ void CS302_Midi::el_to_nd()
 void CS302_Midi::nd_to_el()
 {
   el = new EventList;
+  //Temp map to store contents of nd
+  multimap <int, Event *> tmp;
+	map<int, multimap <int, Event *> >;
+  for(std::iterator ndit = nd.begin(); it != nd.end(); ndit++){
+	ND *note = NULL;
+	note = *it;
+	//Dealing with a note
+	//every note must have an on/off event
+	if(note->key == 'N'){
+		//Create On Event
+		Event *onEvent = NULL;
+		onEvent->key = 'O';
+		onEvent->v2 = note->volume;
+		onEvent->v1 = note->pitch;
+		//Create Off Event
+		Event *offEvent = NULL;
+		offEvent->key = 'F'
+		offEvent->v1 = note->pitch;
+		//Fill in information
+	}
+	//Dealing with a damper
+	if(note->key == 'D){
+		//Create new DamperDown
+		Event *dd = NULL;
+		dd->key = 'D';
+		dd->v1 = 1;
+		//Create new DamperUp
+		Event *du = NULL;
+		du->key = 'D';
+		du->v1 = 0;
+		//Fill in info
+	}
+  }
+
+
 }
