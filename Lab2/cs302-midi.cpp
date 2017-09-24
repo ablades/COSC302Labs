@@ -95,83 +95,85 @@ void CS302_Midi::el_to_nd()
 void CS302_Midi::nd_to_el()
 {
 
-	enum eventType {OFF, ON, DU , DD};
+	enum eventType {OFF = 0, ON = 3, DU = 1 , DD = 2};
   	el = new EventList;
   	//Temp map to store contents of nd
-	map<int, multimap <int, Event *> > mtmp;
+	
+	map<int, multimap<int, Event *> >tmp;
+	Event* du = NULL;
+	ND *note = NULL;
+	Event* onEvent = NULL;
+	Event* offEvent = NULL;
+	Event* dd = NULL;
   	for(NDMap::iterator ndit = nd->begin(); ndit != nd->end(); ndit++){
-		ND *note = NULL;
 		note = ndit->second;
 
-		Event *onEvent = NULL;
-		Event *offEvent = NULL;
 		//Dealing with a note
 		//every note must have an on/off event
 		if(note->key == 'N'){
 			//Create On Event
-			Event* onEvent = NULL;
 			onEvent = new Event;
 			onEvent->key = 'O';
 			onEvent->v2 = note->volume;
 			onEvent->v1 = note->pitch;
 			onEvent->time = rint(note->stop * 480);
-			mtmp[onEvent->time].insert(std::pair<int, Event *>(ON, onEvent));
+			tmp[onEvent->time].insert(pair<int, Event *>(ON,onEvent));
 			//Create Off Event
-			Event* offEvent = NULL;
 			offEvent = new Event;
 			offEvent->key = 'F';
 			offEvent->v1 = note->pitch;
 			offEvent->time = rint(note->stop * 480);
-			mtmp[offEvent->time].insert(std::pair<int, Event *>(OFF, offEvent));
 			//Fill in information
+			tmp[offEvent->time].insert(pair<int, Event *>(OFF,offEvent));
 		}
 		//Dealing with a damper
 		if(note->key == 'D'){
 			//Create new DamperDown
-			Event* dd = NULL;
 			dd = new Event;
 			dd->key = 'D';
 			dd->v1 = 1;
 			dd->time = rint(note->start * 480);
-			mtmp[dd->time].insert(std::pair<int, Event *>(DD, dd));
+			cout << dd->time;
+			tmp[dd->time].insert(pair<int, Event *>(DD, dd));
 			//Create new DamperUp
-			Event* du = NULL;
 			du = new Event;
 			du->key = 'D';
 			du->v1 = 0;
-			dd->time = rint(note->stop * 480);
+			du->time = rint(note->stop * 480);
 			//Fill in info
-			mtmp[dd->time].insert(std::pair<int, Event *>(DU, du));
+			tmp[du->time].insert(pair<int, Event *>(DU, du));
 
 		}
 	}
 
+
 	//MAP IS SORTED BY THE TIME IN WHICH EVENTS OCCUR ABSOLUTELY
 	//Iterates through the map
-	for(std::map<int, multimap<int, Event*> >::iterator mit = mtmp.begin(); mit != mtmp.end(); mit++){
+	Event *event = NULL;
+	for(std::map<int, multimap<int, Event *> >::iterator mit = tmp.begin(); mit != tmp.end(); mit++){
 		//Creates reference to the multimap at each time
-		multimap<int, Event*> mm = mit->second;
 		//Iterates through the Multimap starting from second unit
 		bool timeSet = false;
-		for(std::multimap<int, Event*>::iterator mmit = mm.begin(); mmit != mm.end(); mit++){
-			Event *event = NULL;
+		for(std::multimap<int, Event*>::iterator mmit = mit->second.begin(); mmit != mit->second.end(); mmit++){
+			event = NULL;
 			event = mmit->second;
 			
 			//set time of inital event if iterator
-			if(timeSet == false && (mit--) != mtmp.end()){
+			if(timeSet == false ){
 				//The current absolute time
 				int currentTime = mit->first;
-				int previousTime = (mit--)->first;
-				event->time = currentTime - previousTime;
+				
+				event->time = currentTime ;
 				timeSet = true;
 			}
-
+			else
+				event->time = 0;
 			//Events in same map occur at same time
-			event->time = 0;
 			//Convert the time
 			
 			//Push to EL
-
+			el->push_back(event);
+			
 		}
 	}
 }
