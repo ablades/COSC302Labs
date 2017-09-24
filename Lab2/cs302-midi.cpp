@@ -99,7 +99,7 @@ void CS302_Midi::nd_to_el()
   	el = new EventList;
   	//Temp map to store contents of nd
 	map<int, multimap <int, Event *> > mtmp;
-  	for(std::iterator ndit = nd.begin(); it != nd.end(); ndit++){
+  	for(NDMap::iterator ndit = nd->begin(); ndit != nd->end(); ndit++){
 		ND *note = NULL;
 		note = ndit->second;
 
@@ -119,7 +119,7 @@ void CS302_Midi::nd_to_el()
 			//Create Off Event
 			Event* offEvent = NULL;
 			offEvent = new Event;
-			offEvent->key = 'F'
+			offEvent->key = 'F';
 			offEvent->v1 = note->pitch;
 			offEvent->time = rint(note->stop * 480);
 			mtmp[offEvent->time].insert(std::pair<int, Event *>(OFF, offEvent));
@@ -148,20 +148,20 @@ void CS302_Midi::nd_to_el()
 
 	//MAP IS SORTED BY THE TIME IN WHICH EVENTS OCCUR ABSOLUTELY
 	//Iterates through the map
-	for(std::iterator mit = mtmp.begin(); mit != mtmp.end(); mit++){
+	for(std::map<int, multimap<int, Event*> >::iterator mit = mtmp.begin(); mit != mtmp.end(); mit++){
 		//Creates reference to the multimap at each time
 		multimap<int, Event*> mm = mit->second;
 		//Iterates through the Multimap starting from second unit
 		bool timeSet = false;
-		for(std::iterator mmit = mm.begin(); mmit != mm.end(); mit++){
+		for(std::multimap<int, Event*>::iterator mmit = mm.begin(); mmit != mm.end(); mit++){
 			Event *event = NULL;
 			event = mmit->second;
 			
 			//set time of inital event if iterator
-			if(timeSet == false && (mit - 1) != mtmp.end()){
+			if(timeSet == false && (mit--) != mtmp.end()){
 				//The current absolute time
 				int currentTime = mit->first;
-				int previousTime = (mit - 1)->first;
+				int previousTime = (mit--)->first;
 				event->time = currentTime - previousTime;
 				timeSet = true;
 			}
