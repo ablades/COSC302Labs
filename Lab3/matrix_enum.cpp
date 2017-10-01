@@ -107,19 +107,22 @@ void Matrix::Print(){
 		}	
 		cout << endl;
 	}		
+
 	//Print in numerical format
 	if(*P == 'h'){
 		int sum = 0;
 		for(int row = 0; row < W; row++){
 			for(int col = 0; col < W; col++){
-				if(permutation[col] == col)
+				
+				if(permutation[row] == col)
 					sum += 1 + col;
-				else if(E_ID[col] == (row * W + col))
+				else if(find(E_ID.begin(), E_ID.end(), (row * W + col)) != E_ID.end())
 					sum += 1 + col;
 			}
-		cout << sum <<endl;
-		sum = 0;
-		}
+			cout << sum << endl;
+			sum = 0;		
+		}	
+		cout << endl;
 	}
 }
 
