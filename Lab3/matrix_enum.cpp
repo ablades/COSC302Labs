@@ -19,16 +19,22 @@ class Matrix{
 void Matrix::Permute(int index){
 	//BaseCase
 	//If we've reached the final possible permutation we print it
-	if(index == permutation.size()){
-		cout << permutation[0];
+	if(index == W){
 		//Print permutation here
-		//clear and claculate non -x 
-		//clear eid
-		//nchose k
-		Choose(0);
-		return;
+		//Clear and calculate
+		Non_X.clear();
+		for(int row = 0; row < permutation.size(); i++){
+			for(int col = 0; col < W-1; col++){
+				//if there isnt a value in that column we can add it!
+				if(permutation[row] != col)
+					Non_X.push_back(row * W + col);
+			}
+		}
 
+		E_ID.clear();
+		Choose(0);
 	}
+
 	//Creates all possible permutations
 	for(int i = index; i < permutation.size(); i++){
 		//swap current pointers
@@ -38,7 +44,6 @@ void Matrix::Permute(int index){
 		//Return to orignal permutation so next permutation can be made based off original permutation
 		swap(permutation[i], permutation[index]);
 	}
-
 }
 
 void Matrix::Choose(int index){
