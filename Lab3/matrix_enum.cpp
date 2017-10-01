@@ -26,16 +26,28 @@ void Matrix::Permute(int index){
 		//Print permutation here
 		//Clear and calculate
 		Non_X.clear();
-		for(int row = 0; row < permutation.size(); row++){
-			for(int col = 0; col < W-1; col++){
+		for(int row = 0; row < W; row++){
+			for(int col = 0; col < W; col++){
 				//if there isnt a value in that column we can add it!
 				if(permutation[row] != col)
 					Non_X.push_back(row * W + col);
 			}
 		}
 
+		/*Prints out all possible non x spots for testing! WORKING
+		for(int i = 0; i < Non_X.size();i++){
+			cout << Non_X[i] << " ";
+		}
+		cout << endl;*/
+
 		E_ID.clear();
 		Choose(0);
+
+		/*Prints out hte permutation for testing! WORKING
+		for(int i = 0; i < permutation.size();i++){
+			cout << permutation[i] << " ";
+		}
+		cout << endl;*/
 	}
 
 	//Creates all possible permutations
@@ -54,7 +66,7 @@ void Matrix::Choose(int index){
 	//Base Case 1
 	//If all E's have been added print!
 	if(E_ID.size() == E){
-		Print();
+	//	Print();
 		return;
 	}
 
@@ -68,14 +80,14 @@ void Matrix::Choose(int index){
 	//Reset
 	E_ID.pop_back();
 	//Find next permutation
-	Choose(index+1);
+	Choose(index);
 }
 
 void Matrix::Print(){
 	//Print in normal format;
 	if(P == 'x'){
-		for(int row = 0; row < permutation.size(); row++){
-			for(int col = 0; col < W-1; col++){
+		for(int row = 0; row < W; row++){
+			for(int col = 0; col < W; col++){
 				
 				if(permutation[col] == col)
 					cout << 'X';
@@ -90,8 +102,8 @@ void Matrix::Print(){
 	//Print in numerical format
 	if(P == 'h'){
 		int sum = 0;
-		for(int row = 0; row < permutation.size(); row++){
-			for(int col = 0; col < W-1; col++){
+		for(int row = 0; row < W; row++){
+			for(int col = 0; col < W; col++){
 				if(permutation[col] == col)
 					sum += 1 + col;
 				else if(E_ID[col] == (row * W + col))
@@ -104,9 +116,7 @@ void Matrix::Print(){
 }
 
 
-int main(int argc, char *argv[4]){
-	if(argc != 4)
-		cerr << "Wrong Input";
+int main(int argc, char *argv[]){
 		Matrix M;
 	//dimensions of matrix
 	M.W = atoi(argv[1]);
@@ -114,11 +124,9 @@ int main(int argc, char *argv[4]){
 	M.E = atoi(argv[2]);
 	//Print format of the permutations
 	M.P = atoi(argv[3]);
-	//changes the size of the permutation vector to match
-	M.permutation.resize(M.W);
 	//sets up intial permutation structure
-	for(int i = 0; i < M.permutation.size(); i++)
-		M.permutation[i] = i;
+	for(int i = 0; i < M.W; i++)
+		M.permutation.push_back(i);
 	//Begins the permutations
 	M.Permute(0);
 
