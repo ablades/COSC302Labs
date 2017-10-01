@@ -51,7 +51,8 @@ void Matrix::Choose(int index){
 	//Base Case 1
 	//If all E's have been added print!
 	if(E_ID.size() == E){
-		Matrix::Print();
+		Print();
+		return;
 	}
 
 	//Base Case 2 If there are more E's than we can fit not possible so return!
@@ -70,10 +71,33 @@ void Matrix::Choose(int index){
 void Matrix::Print(){
 	//Print in normal format;
 	if(P == 'x'){
-
+		for(int row = 0; row < permutation.size(); row++){
+			for(int col = 0; col < W-1; col++){
+				
+				if(permutation[col] == col)
+					cout << 'X';
+				else if(E_ID[col] == (row * W + col))
+					cout << 'E';
+				else
+					cout << '.'
+			}
+			cout <<endl;
+		}
 	}
 	//Print in numerical format
-	if(P == 'h')
+	if(P == 'h'){
+		int sum = 0;
+		for(int row = 0; row < permutation.size(); row++){
+			for(int col = 0; col < W-1; col++){
+				if(permutation[col] == col)
+					sum += 1 + col;
+				else if(E_ID[col] == (row * W + col))
+					sum += 1 + col;
+			}
+		cout << sum <<endl;
+		sum = 0;
+		}
+	}
 }
 
 
