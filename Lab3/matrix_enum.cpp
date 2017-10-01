@@ -1,7 +1,10 @@
 /*Audaris Blades
 Lab3
 Matrix Enumeration*/
-
+#include <vector>
+#include <iostream>
+#include <cstdlib>
+using namespace std;
 class Matrix{
 	public:
 		int W; //Matrix Rows/Cols
@@ -23,7 +26,7 @@ void Matrix::Permute(int index){
 		//Print permutation here
 		//Clear and calculate
 		Non_X.clear();
-		for(int row = 0; row < permutation.size(); i++){
+		for(int row = 0; row < permutation.size(); row++){
 			for(int col = 0; col < W-1; col++){
 				//if there isnt a value in that column we can add it!
 				if(permutation[row] != col)
@@ -79,9 +82,9 @@ void Matrix::Print(){
 				else if(E_ID[col] == (row * W + col))
 					cout << 'E';
 				else
-					cout << '.'
+					cout << '.';
 			}
-			cout <<endl;
+			cout << endl;
 		}
 	}
 	//Print in numerical format
@@ -102,24 +105,20 @@ void Matrix::Print(){
 
 
 int main(int argc, char *argv[4]){
-
 	if(argc != 4)
 		cerr << "Wrong Input";
-	//Program name
-	argv[0]
+		Matrix M;
 	//dimensions of matrix
-	W = argv[1];
+	M.W = atoi(argv[1]);
 	//Number of E's to be inserted into permutations
-	E = argv[2];
+	M.E = atoi(argv[2]);
 	//Print format of the permutations
-	P = argv[3];
-
-	Matrix M;
+	M.P = atoi(argv[3]);
 	//changes the size of the permutation vector to match
-	M.permutation.resize(W);
+	M.permutation.resize(M.W);
 	//sets up intial permutation structure
-	for(int i = 0; i < permutation.size(); i++)
-		permutation[i] = i;
+	for(int i = 0; i < M.permutation.size(); i++)
+		M.permutation[i] = i;
 	//Begins the permutations
 	M.Permute(0);
 
