@@ -4,8 +4,8 @@ Matrix Enumeration*/
 
 class Matrix{
 	public:
-		int W;
-		int E;
+		int W; //Matrix Rows/Cols
+		int E; // Extra NonZero entrires
 		int P;
 		vector<int> permutation;
 		vector<int> Non_X;
@@ -17,16 +17,15 @@ class Matrix{
 
 
 void Matrix::Permute(int index){
-	int i;
-	int temp;
 	//BaseCase
 	//If we've reached the final possible permutation we print it
 	if(index == permutation.size()){
 		cout << permutation[0];
-
-		for(i = 1; i < permutation.size(); i++)
-			cout << " " << permutation[i];
-		cout << endl;
+		//Print permutation here
+		//clear and claculate non -x 
+		//clear eid
+		//nchose k
+		Choose(0);
 		return;
 
 	}
@@ -42,12 +41,57 @@ void Matrix::Permute(int index){
 
 }
 
+void Matrix::Choose(int index){
 
-int main(int argc, char *argv[3]){
+	//Base Case 1
+	//If all E's have been added print!
+	if(E_ID.size() == E){
+		Matrix::Print();
+	}
+
+	//Base Case 2 If there are more E's than we can fit not possible so return!
+	if(E_ID.size() > (Non_X.size() - index))
+		return;
+	//Then the location in Non_X is valid so add it
+	E_ID.push_back(Non_X[index]);
+	//Find Next Permutation
+	Choose(index+1);
+	//Reset
+	E_ID.pop_back();
+	//Find next permutation
+	Choose(index+1);
+}
+
+void Matrix::Print(){
+	//Print in normal format;
+	if(P == 'x'){
+
+	}
+	//Print in numerical format
+	if(P == 'h')
+}
+
+
+int main(int argc, char *argv[4]){
+
+	if(argc != 4)
+		cerr << "Wrong Input";
 	//Program name
 	argv[0]
 	//dimensions of matrix
-	argv[1]
-	//print format
-	argv[2]
+	W = argv[1];
+	//Number of E's to be inserted into permutations
+	E = argv[2];
+	//Print format of the permutations
+	P = argv[3];
+
+	Matrix M;
+	//changes the size of the permutation vector to match
+	M.permutation.resize(W);
+	//sets up intial permutation structure
+	for(int i = 0; i < permutation.size(); i++)
+		permutation[i] = i;
+	//Begins the permutations
+	M.Permute(0);
+
 }
