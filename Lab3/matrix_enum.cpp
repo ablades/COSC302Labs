@@ -115,11 +115,11 @@ void Matrix::Print(){
 			for(int col = 0; col < W; col++){
 				
 				if(permutation[row] == col)
-					sum += 1 + col;
+					sum |= 1 << col;
 				else if(find(E_ID.begin(), E_ID.end(), (row * W + col)) != E_ID.end())
-					sum += 1 + col;
+					sum |= 1 << col;
 			}
-			cout << sum << endl;
+			cout << hex << sum << endl; 	
 			sum = 0;		
 		}	
 		cout << endl;
