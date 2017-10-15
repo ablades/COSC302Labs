@@ -90,46 +90,51 @@ void Superball::analyze(){
 	//Stores size of unioned colors at color index
 	vector<int> ranks;
   vector<bool> printed;
-	ranks.resize(r*c, 0);
-  printed.resize(r*c,false);
+	ranks.resize(r*c, 1);
+  printed.resize(r*c, false);
 
   //Sets all links
   for(int i = 0; i < board.size();i++){
     if(board[i] != '.' && board[i] != '*'){
-      //Check adjecent cell if we're not in the last column
+      //Check adjecent cell
       int s1;
       int s2;
       int s3;
+
+      //Check adjecent cell
       if(board[i] == board[i+1] && i % c != c - 1){
         s1 = DJ->Find(i);
         s2 = DJ->Find(i+1);
+
+        if(s1 != s2){
         s3 = DJ->Union(s1, s2);
-        ranks[s1]++;
-        ranks[s2]++;
-        ranks[s3]++; 
+        ranks[s3] = ranks[s2] + ranks[s1];
+        }
+      }
+
+      //Check lower adjecent cell
+      if(board[i] == board[i+c] && i/c != r-1){
+        s1 = DJ->Find(i);
+        s2 = DJ->Find(i+c);
+
+        if(s1 != s2){
+          s3 = DJ->Union(s1, s2);  
+          ranks[s3] = ranks[s2] + ranks[s1];
+        }
       }
       
-      if(board[i] == board[i+c] && i/c != r-1){
-        s1= DJ->Find(i);
-        s2 = DJ->Find(i+c);
-        s3 = DJ->Union(s1, s2);
-        ranks[s1]++;
-        ranks[s2]++;
-       // ranks[s3]++;;  
-      }
     }
   }
-  cout << "Scoring Sets:" << endl;
+  cout << "Scoring sets:" << endl;
   //Loop through goals board
   for(int i = 0; i < goals.size();i++){
     if(goals[i] == 1 && board[i] != '.' && board[i] != '*'){
       int root = DJ->Find(i);
-
       if(ranks[root] >= mss && printed[root] == false){
         printed[root] = true;
-        cout << "  Size: " << setw(2) << setfill(' ') << ranks[root] << " Char: " << (char)board[i] << " Scoring Cell: " << i/c << "," << i%c << endl;
+        cout << " Size: " << setw(2) << setfill(' ') << ranks[root] << " Char: " << (char)board[i] << " Scoring Cell: " << i/c << "," << i%c << endl;
       } 
-      }
+    }
   }
 }
 
@@ -150,10 +155,5 @@ main(int argc, char **argv)
     }
   }
   s->analyze();
-
-  printf("Empty cells:                    %2d\n", s->empty);
-  printf("Non-Empty cells:                %2d\n", s->r*s->c - s->empty);
-  printf("Number of pieces in goal cells: %2d\n", ngoal);
-  printf("Sum of their values:            %2d\n", tgoal);
   exit(0);
 }
