@@ -16,6 +16,7 @@ using namespace std;
 class Superball {
   public:
     Superball(int argc, char **argv);
+    void analyze();
     int r;
     int c;
     int mss;
@@ -81,12 +82,12 @@ Superball::Superball(int argc, char **argv)
         board[i*c+j] = tolower(board[i*c+j]);
       }
     }
+
+    DJ = new Disjoint(r*c);
   }
 }
 
-sb-analyze(){
-	//Disjoint set that is the size of the board
-	DJ = new Disjoint(r*c);
+void Superball::analyze(){
 	//Stores size of unioned colors at color index
 	vector<int> ranks;
   vector<bool> printed;
@@ -102,10 +103,10 @@ sb-analyze(){
 			int dCol = i*r*c + j;
 			//dont forget first cell
 			if((rCol % c-1 != 0 || j == 0) && board[rCol] == board[index])
-				ranks[DJ.Union(DJ.Find(index), DJ.Find(rCol))]++;
+				ranks[DJ->Union(DJ->Find(index), DJ->Find(rCol))]++;
 
 			if((dCol % r-1 != 0 || i == 0) && board[dCol] == board[index])
-				ranks[DJ.Union(DJ.Find(index), DJ.Find(dCol))];
+				ranks[DJ->Union(DJ->Find(index), DJ->Find(dCol))];
 		}
 	}
   cout << "Scoring Sets:" << endl;
@@ -115,7 +116,7 @@ sb-analyze(){
       //scoring cell
       if(goals[i*j + j] == 1 && printed[i*j + j] == false){ 
         printed[i*j + j] = true;
-        cout << "  Size: " << ranks[DJ.Find(i*j +j)] << " Char: " << (char)board[i*j + j] << " Scoring Cell: " << i << "," << j << endl;
+        cout << "  Size: " << ranks[DJ->Find(i*j +j)] << " Char: " << (char)board[i*j + j] << " Scoring Cell: " << i << "," << j << endl;
       }
 
     }
@@ -141,6 +142,7 @@ main(int argc, char **argv)
       ngoal++;
     }
   }
+  s->analyze();
 
   printf("Empty cells:                    %2d\n", s->empty);
   printf("Non-Empty cells:                %2d\n", s->r*s->c - s->empty);
