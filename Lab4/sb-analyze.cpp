@@ -9,6 +9,7 @@
 #include <ctype.h>
 #include <iostream>
 #include <vector>
+#include <iomanip>
 using namespace std;
 
 #define talloc(type, num) (type *) malloc(sizeof(type)*(num))
@@ -57,7 +58,7 @@ Superball::Superball(int argc, char **argv)
 
   board.resize(r*c);
   goals.resize(r*c, 0);
-
+      DJ = new Disjoint(r*c);
   empty = 0;
 
   for (i = 0; i < r; i++) {
@@ -82,8 +83,6 @@ Superball::Superball(int argc, char **argv)
         board[i*c+j] = tolower(board[i*c+j]);
       }
     }
-
-    DJ = new Disjoint(r*c);
   }
 }
 
@@ -92,38 +91,46 @@ void Superball::analyze(){
 	vector<int> ranks;
   vector<bool> printed;
 	ranks.resize(r*c, 0);
+  printed.resize(r*c,false);
 
   //Sets all links
-	for(int i = 0; i < r; i++){
-		for(int j = 0; j < c; j++){
-			int index = i*c + j;
-			//Right Column
-			int rCol = i*c + j + 1;
-			//Lower Column
-			int dCol = i*r*c + j;
-			//dont forget first cell
-			if((rCol % c-1 != 0 || j == 0) && board[rCol] == board[index])
-				ranks[DJ->Union(DJ->Find(index), DJ->Find(rCol))]++;
-
-			if((dCol % r-1 != 0 || i == 0) && board[dCol] == board[index])
-				ranks[DJ->Union(DJ->Find(index), DJ->Find(dCol))];
-		}
-	}
+  for(int i = 0; i < board.size();i++){
+    if(board[i] != '.' && board[i] != '*'){
+      //Check adjecent cell if we're not in the last column
+      int s1;
+      int s2;
+      int s3;
+      if(board[i] == board[i+1] && i % c != c - 1){
+        s1 = DJ->Find(i);
+        s2 = DJ->Find(i+1);
+        s3 = DJ->Union(s1, s2);
+        ranks[s1]++;
+        ranks[s2]++;
+        ranks[s3]++; 
+      }
+      
+      if(board[i] == board[i+c] && i/c != r-1){
+        s1= DJ->Find(i);
+        s2 = DJ->Find(i+c);
+        s3 = DJ->Union(s1, s2);
+        ranks[s1]++;
+        ranks[s2]++;
+       // ranks[s3]++;;  
+      }
+    }
+  }
   cout << "Scoring Sets:" << endl;
   //Loop through goals board
-  for(int i = 0; i < r; i++){
-    for(int j = 0; j < c; j++){
-      //scoring cell
-      if(goals[i*j + j] == 1 && printed[i*j + j] == false){ 
-        printed[i*j + j] = true;
-        cout << "  Size: " << ranks[DJ->Find(i*j +j)] << " Char: " << (char)board[i*j + j] << " Scoring Cell: " << i << "," << j << endl;
+  for(int i = 0; i < goals.size();i++){
+    if(goals[i] == 1 && board[i] != '.' && board[i] != '*'){
+      int root = DJ->Find(i);
+
+      if(ranks[root] >= mss && printed[root] == false){
+        printed[root] = true;
+        cout << "  Size: " << setw(2) << setfill(' ') << ranks[root] << " Char: " << (char)board[i] << " Scoring Cell: " << i/c << "," << i%c << endl;
+      } 
       }
-
-    }
-
   }
-
-
 }
 
 main(int argc, char **argv)
