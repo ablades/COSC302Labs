@@ -89,8 +89,10 @@ sb-analyze(){
 	DJ = new Disjoint(r*c);
 	//Stores size of unioned colors at color index
 	vector<int> ranks;
+  vector<bool> printed;
 	ranks.resize(r*c, 0);
 
+  //Sets all links
 	for(int i = 0; i < r; i++){
 		for(int j = 0; j < c; j++){
 			int index = i*c + j;
@@ -99,17 +101,28 @@ sb-analyze(){
 			//Lower Column
 			int dCol = i*r*c + j;
 			//dont forget first cell
-			if((rCol % c-1 != 0 || j == 0) && board[rCol] == board[index]){
-				DJ.Union(DJ.Find(index), DJ.Find(rCol));
-				ranks[DJ.Find(index)]++; 
-			}
+			if((rCol % c-1 != 0 || j == 0) && board[rCol] == board[index])
+				ranks[DJ.Union(DJ.Find(index), DJ.Find(rCol))]++;
 
-			if((dCol % r-1 != 0 || i == 0) && board[dCol] == board[index]){
-				DJ.Union(DJ.Find(index), DJ.Find(dCol));
-			}
-
+			if((dCol % r-1 != 0 || i == 0) && board[dCol] == board[index])
+				ranks[DJ.Union(DJ.Find(index), DJ.Find(dCol))];
 		}
 	}
+  cout << "Scoring Sets:" << endl;
+  //Loop through goals board
+  for(int i = 0; i < r; i++){
+    for(int j = 0; j < c; j++){
+      //scoring cell
+      if(goals[i*j + j] == 1 && printed[i*j + j] == false){ 
+        printed[i*j + j] = true;
+        cout << "  Size: " << ranks[DJ.Find(i*j +j)] << " Char: " << (char)board[i*j + j] << " Scoring Cell: " << i << "," << j << endl;
+      }
+
+    }
+
+  }
+
+
 }
 
 main(int argc, char **argv)
