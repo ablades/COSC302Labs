@@ -91,11 +91,10 @@ Superball::Superball(int argc, char **argv)
 void:: Superball::play(){
   int swap1;
   int swap2;
-  int maxSpot
+  int maxSpot;
   int maxScore = 0;
-  int closestMin;
   vector<int> spotScore;
-  spotScore.resize(r*c, 1);
+  spotScore.resize(r*c, 0);
 
   //Give each spot a score based on adjecent values
   for(int i = 0; i < board.size();i++){
@@ -114,21 +113,21 @@ void:: Superball::play(){
       else if(board[i-1] == '.')
         spotScore[i]--;
       //Lower adjeceny
-      if( i + c > r*c && board[i] == board[i+c]){
+      if( i + c < r*c && board[i] == board[i+c]){
         spotScore[i]++;
       }
       else if(board[i+c] == '.')
         spotScore[i]--;
 
       //Upper Adjeceny
-      if(board[i] == board[i-c]  i/c != r-1){
+      if(board[i] == board[i-c] && i/c != r-1){
         spotScore[i]++;
       }
       else if(board[i-c] == '.')
         spotScore[i]--;
 
       //Increase priority of spot if on a goal cell.
-      if(goal[i] == 1){
+      if(goals[i] == 1){
         spotScore[i] *= 2;
       }
 
@@ -145,18 +144,40 @@ void:: Superball::play(){
   int minSpot = maxSpot;
   for(int i = 0; i < board.size(); i++){
     //if we find an element with the same color as the maximum element and smaller score store it
-    if(board[i] == spotScore[maxSpot]){
+    if(board[i] == board[maxSpot]){
       if(spotScore[i] <= minScore){
         minSpot = i;
         minScore = spotScore[i];
       }
     }
   }
+  //Test print scores
+ /* for(int i = 0; i < spotScore.size();i++){
+    if( (i + c) % c == 0)
+      cout <<endl;
+    cout << spotScore[i];
+  }*/
+
+  int closestMinSpot = maxSpot;
+  if((maxSpot-1) > 0 && maxSpot % c != c - 1 && spotScore[maxSpot -1] < closestMinSpot)
+    closestMinSpot = maxSpot -1;
+
+  if( maxSpot + c < r*c && spotScore[maxSpot + c] < closestMinSpot)
+    closestMinSpot = maxSpot + c;
+
+  if(spotScore[maxSpot-c] && maxSpot/c != r-1 && spotScore[maxSpot-c] < closestMinSpot){
+    closestMinSpot = maxSpot - c;
+  }
+
+  /*if(maxSpot % c != c - 1 && spotScore[maxSpot+1] < closestMinSpot)
+    closestMinSpot = maxSpot + 1;*/
+
 
   //Now find color of same type with lowest score
 
-  //Call swap
 
+  //Call swap
+  cout << "SWAP " << closestMinSpot/c <<' '<< closestMinSpot%c << ' '<< minSpot/c << ' '<<  (minSpot%c) << endl;
 
 }
 void Superball::analyze(){
@@ -227,6 +248,7 @@ main(int argc, char **argv)
       ngoal++;
     }
   }
-  s->analyze();
+  s->play();
+  //s->analyze();
   exit(0);
 }
