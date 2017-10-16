@@ -1,6 +1,8 @@
 /*Audaris Blades
  * Lab 5
  * Superball
+ *sb-analyze.cpp
+ * Calculate Scoring sets using Disjoint Sets
  */
 #include "DJ.h"
 #include <cstdio>
@@ -87,7 +89,6 @@ Superball::Superball(int argc, char **argv)
 }
 
 void Superball::analyze(){
-	//Stores size of unioned colors at color index
 	vector<int> ranks;
   vector<bool> printed;
 	ranks.resize(r*c, 1);
@@ -122,9 +123,10 @@ void Superball::analyze(){
           ranks[s3] = ranks[s2] + ranks[s1];
         }
       }
-      
+
     }
   }
+  
   cout << "Scoring sets:" << endl;
   //Loop through goals board
   for(int i = 0; i < goals.size();i++){
