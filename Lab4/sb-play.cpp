@@ -89,42 +89,51 @@ Superball::Superball(int argc, char **argv)
   }
 }
 void:: Superball::play(){
-  int swap1;
-  int swap2;
-  int maxSpot;
-  int maxScore = 0;
+  int maxIndex;
+  int maxScore;
+  int minScore;
+  int minIndex;
+  int secondMin;
   vector<int> spotScore;
-  spotScore.resize(r*c, 0);
+  spotScore.resize(r*c, 1);
 
   //Give each spot a score based on adjecent values
   for(int i = 0; i < board.size();i++){
     if(board[i] != '.' && board[i] != '*'){
       //Right cell
       if(board[i] == board[i+1] && i % c != c - 1){
-        spotScore[i]++;
+        spotScore[i]+=2;
       }
       else if(board[i+1] == '.')
-        spotScore[i]--;
+        spotScore[i]-= 5;
+      else
+        spotScore[i]++;
 
       //Left Cell
       if((i-1) > 0 && board[i] == board[i-1] && i % c != c - 1){
-        spotScore[i]++;
+        spotScore[i]+= 2;
       }
       else if(board[i-1] == '.')
-        spotScore[i]--;
+        spotScore[i]-=5;
+      else
+        spotScore[i]++;
       //Lower adjeceny
       if( i + c < r*c && board[i] == board[i+c]){
-        spotScore[i]++;
+        spotScore[i]+=2;
       }
       else if(board[i+c] == '.')
-        spotScore[i]--;
+        spotScore[i]-=5;
+      else
+        spotScore[i]++;
 
       //Upper Adjeceny
       if(board[i] == board[i-c] && i/c != r-1){
-        spotScore[i]++;
+        spotScore[i]+=2;
       }
       else if(board[i-c] == '.')
-        spotScore[i]--;
+        spotScore[i]-=5;
+      else
+        spotScore[i]++;
 
       //Increase priority of spot if on a goal cell.
       if(goals[i] == 1){
@@ -134,50 +143,21 @@ void:: Superball::play(){
       //Save highest score
       if(spotScore[i] > maxScore){
         maxScore = spotScore[i];
-        maxSpot = i;
+        maxIndex = i;
       }
-    }
-  }
-
-  //Find element with lowest score around he maxSpot or different color
-  int minScore = maxScore;
-  int minSpot = maxSpot;
-  for(int i = 0; i < board.size(); i++){
-    //if we find an element with the same color as the maximum element and smaller score store it
-    if(board[i] == board[maxSpot]){
-      if(spotScore[i] <= minScore){
-        minSpot = i;
+      //Save Lowest score
+      if(spotScore[i] < minScore){
         minScore = spotScore[i];
+        minIndex = i;
       }
+
+      if(spotScore[i] < secondMin >= minScore && minIndex != i)
+        secondMin = i;
     }
   }
-  //Test print scores
- /* for(int i = 0; i < spotScore.size();i++){
-    if( (i + c) % c == 0)
-      cout <<endl;
-    cout << spotScore[i];
-  }*/
-
-  int closestMinSpot = maxSpot;
-  if((maxSpot-1) > 0 && maxSpot % c != c - 1 && spotScore[maxSpot -1] < closestMinSpot)
-    closestMinSpot = maxSpot -1;
-
-  if( maxSpot + c < r*c && spotScore[maxSpot + c] < closestMinSpot)
-    closestMinSpot = maxSpot + c;
-
-  if(spotScore[maxSpot-c] && maxSpot/c != r-1 && spotScore[maxSpot-c] < closestMinSpot){
-    closestMinSpot = maxSpot - c;
-  }
-
-  /*if(maxSpot % c != c - 1 && spotScore[maxSpot+1] < closestMinSpot)
-    closestMinSpot = maxSpot + 1;*/
-
-
-  //Now find color of same type with lowest score
-
 
   //Call swap
-  cout << "SWAP " << closestMinSpot/c <<' '<< closestMinSpot%c << ' '<< minSpot/c << ' '<<  (minSpot%c) << endl;
+  cout << "SWAP " << secondMin/c <<' '<< secondMin%c << ' '<< minIndex/c << ' '<<  (minIndex%c) << endl;
 
 }
 void Superball::analyze(){
@@ -219,14 +199,14 @@ void Superball::analyze(){
     }
   }
   
-  cout << "Scoring sets:" << endl;
   //Loop through goals board
   for(int i = 0; i < goals.size();i++){
     if(goals[i] == 1 && board[i] != '.' && board[i] != '*'){
       int root = DJ->Find(i);
+      // Score elements
       if(ranks[root] >= mss && printed[root] == false){
         printed[root] = true;
-        cout << " Size: " << setw(2) << setfill(' ') << ranks[root] << " Char: " << (char)board[i] << " Scoring Cell: " << i/c << "," << i%c << endl;
+        cout << "SCORE " << i/c << " " << i%c << endl;
       } 
     }
   }
@@ -248,7 +228,7 @@ main(int argc, char **argv)
       ngoal++;
     }
   }
+  s->analyze();
   s->play();
-  //s->analyze();
   exit(0);
 }
