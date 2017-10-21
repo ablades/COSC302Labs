@@ -5,6 +5,8 @@
 
 #include <vector>
 #include <iostream>
+#include "sorting.h"
+
 
 
 void recursiveSort(vector <double> &v, int start, int size, int print)
@@ -44,15 +46,29 @@ void recursiveSort(vector <double> &v, int start, int size, int print)
 
         }
         //We're done!
-        if(left == last)
+        if(left == last && right == start)
             break;
-        //Swap elements
-        else
+        //Swap elements and increment pointers
+        else{
             swap(v[left],v[right]);
+            left++;
+            right--;
+        }
     }
-
-
+    //Swap pivot and left element
+    swap(v[left], v[pivot]);
 }
+
+//print out vector
+void print(){
+    for(int i = 0; i < v.size(); i++){
+        cout << v[i] << " ";
+    }
+}
+
+void sort_doubles(vector<double> &v, int print){
+    recursiveSort(v, 0, v.size(), yes);
+};
 
 int main()
 {
