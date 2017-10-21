@@ -8,11 +8,19 @@
 #include "sorting.h"
 
 
+void printList(vector <double> &arr){
+    for(int i = 0; i < arr.size(); i ++){
+        cout << arr[i] << " ";
+    }
+    cout << endl;
+}
+
 
 void recursiveSort(vector <double> &v, int start, int size, int print)
 {
     int first, middle, last;
-    int left, right;
+    int left;
+    int right;
     int pivot;
     first = start;
     middle = (start+size)/2;
@@ -33,24 +41,29 @@ void recursiveSort(vector <double> &v, int start, int size, int print)
 
     left = start +1;
     right = last;
+
+
     //Continue until the left pointer crosses or equals right pointer
     while(left < right){
         //Left pointer increment
-        for(int left = start; (v[left] <= pivot) && (left != start+size); left++)
-        {
+        for(int i = start; (v[i] <= pivot) && (left != start+size); i++)
+            if(v[i] >= pivot)
+                left = i;
 
-        }
+
         //right pointer decrement
-        for(int right = last; (v[right] >= pivot) && (right != start); right--)
-        {
+        for(int j = last; (v[j] >= pivot) && (j != start);j--)
+            if(v[j] <= pivot)
+                right = j;
 
-        }
         //We're done!
         if(left == last && right == start)
             break;
         //Swap elements and increment pointers
         else{
+            printList(v);
             swap(v[left],v[right]);
+            printList(v);
             left++;
             right--;
         }
@@ -59,15 +72,9 @@ void recursiveSort(vector <double> &v, int start, int size, int print)
     swap(v[left], v[pivot]);
 }
 
-//print out vector
-void print(){
-    for(int i = 0; i < v.size(); i++){
-        cout << v[i] << " ";
-    }
-}
 
 void sort_doubles(vector<double> &v, int print){
-    recursiveSort(v, 0, v.size(), yes);
+    recursiveSort(v, 0, v.size(), 1);
 };
 
 int main()
@@ -77,6 +84,11 @@ int main()
     int i, j, k;
 
     vector<double> v;
+    v.push_back(5.77); v.push_back(5.26); v.push_back(6.49); v.push_back(0.43);
+    v.push_back(6.09);  v.push_back(4.95);  v.push_back(3.15);  v.push_back(3.46);
+    v.push_back(7.55); v.push_back( 6.82); v.push_back(6.69);  v.push_back(3.62);
+
+    recursiveSort(v,0, v.size(), 1);
 
     return 0;
 }
