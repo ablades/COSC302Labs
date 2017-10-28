@@ -4,7 +4,10 @@
  */
 #include <vector>
 #include <string>
-#include <istream>
+#include <iostream>
+#include <cmath>
+
+using namespace std;
 //Node structure
 class Node{
     //ids are ints
@@ -37,7 +40,7 @@ bool Graph::dfs(int node){
 	//Adjecency
 	//0- North  1-South 2-East 3-West
 	if(graph[node]->visited)
-        return;
+        return 0;
 
 	//Base Case Reached start
 	if(graph[node]->id == 0)
@@ -50,16 +53,16 @@ bool Graph::dfs(int node){
 	graph[node]->visited = true;
 
     if(graph[node]->adjList[0] != -1)
-        dfs(graph[adjList[0]]);
+        dfs(graph[node]->adjList[0]);
 
     if(graph[node]->adjList[1] != -1)
-        dfs(graph[adjList[1]]);
+        dfs(graph[node]->adjList[1]);
 
     if(graph[node]->adjList[2] != -1)
-        dfs(graph[adjList[2]]);
+        dfs(graph[node]->adjList[2]);
 
     if(graph[node]->adjList[3] != -1)
-        dfs(graph[adjList[3]]);
+        dfs(graph[node]->adjList[3]);
 	//visited return
  //base case first index
     //solve maze backwards
@@ -82,15 +85,17 @@ int main(){
     //store in variable
     int rows;
     int cols;
-    Graph g = new Graph();
-
-    cin >> cin.ignore() >> rows >> cin.ignore() >> cols ;
-    //initialize node vectorf
+    Graph g;
+    cin.ignore();
+    cin >> rows;
+    cin.ignore();
+    cin >> cols;
+    //initialize node vector
     for(int i = 0; i < cols; i++){
         for(int j = 0; j < rows; j++){
 
             int index = i*cols + j;
-            Node n = new Node();
+            Node n;
 
             //Look North
             if((i*(cols - 1) + j > 0)){
@@ -113,7 +118,7 @@ int main(){
             }
 
             //Add node to vector
-            g.graph.pushback(&n);
+            g.graph.push_back(&n);
         }
     }
     string s;
@@ -154,7 +159,7 @@ int main(){
             }
 
         }
-    
+
 
     }
     //store in variable
@@ -167,5 +172,5 @@ int main(){
     //initialize adj -1
     //make each index in adj list represent a direction [_ _ _ _] (N S W E)
     //print back out rows and cols
-    dfs(rows*cols -1);
+    g.dfs(rows*cols -1);
 }
