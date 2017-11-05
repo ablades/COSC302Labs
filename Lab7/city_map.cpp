@@ -9,61 +9,89 @@
 #include <iterator>
 
 City_Map::City_Map(){
-    Intersection *IS = new Intersection();
-    City_Map *c = new City_Map;
+   // cout << "HERE";
+    Intersection *IS;
 
-    double input;
+    double x, y, gStr, gAve;
     int st, ave;
+    int count = 0;
     int stmax, avemax;
     while(cin >> st){
+        {
+       // cout << count++;
+        IS = new Intersection;
+        //cout << "HERE";
+        cin >> ave >> x >> y >> gStr >> gAve;
         IS->street = st;
-        cin >> ave;
         IS->avenue = ave;
-        cin >> input;
-        IS->x = input;
-        cin >> input;
-        IS->y = input;
-        cin >> input;
-        IS->green[0] = input;
-        cin >> input;
-        IS->green[1] = input;
-        c->all.push_back(IS);
-
+        IS->x = x;
+        IS->y = y;
+        IS->green[0] = gStr;
+        IS->green[1] = gAve;
         //First Intersection
         if(st == 0 & ave == 0)
-            c->first = IS;
+            first = IS;
         //Set Last intersection point
-        if(st > stmax || ((stmax == st) && ave >= avemax)){
+        if(st > stmax || ((stmax == st) && ave > avemax)){
             stmax = st;
             avemax = ave;
-            c->last = IS;
+            last = IS;
         }
-        IS = new Intersection();
+        all.push_back(IS);
+        }
     }
     //set initial size of temp vector
-    vector< vector<Intersection *> > tmp(stmax+1, vector<Intersection *>(avemax +1));
+    vector< vector<Intersection *> > tmp(stmax +1, vector<Intersection *>(avemax+1));
 
     //Store contents of all into temp in proper position
-        for(list<Intersection *>::iterator itr = c->all.begin(); itr !=  c->all.end(); itr++)
+        for(list<Intersection *>::iterator itr = all.begin(); itr !=  all.end(); itr++)
             tmp[(*itr)->street][(*itr)->avenue] = *itr;
 
-    for(int i = 0; i < stmax; i++)
+    Road_Segment* rs;
+    for(int i = 0; i < stmax; i++){
         for(int j = 0; j < avemax; i++){
             //Look Up
             if(i > 0 && (j % 5 == 0 || j % 2 != 0 || j == avemax)){
+                rs = new Road_Segment;
+                rs->type = AVENUE;
+                rs->number = j;
+                rs->from = tmp[i][j];
+                rs->to = tmp[i-1][j];
 
+                tmp[i][j]->adj.push_back(rs);
             }
             //Look Down
             if(i < stmax && (j % 2 == 0 || j % 5 == 0 || j == avemax)){
-                //create road segment
+                rs = new Road_Segment;//create road segment
+                rs->type = AVENUE;
+                rs->number = j;
+                rs->from = tmp[i][j];
+                rs->to = tmp[i+1][j];
 
+                tmp[i][j]->adj.push_back(rs);
             }
             //Look left
-            if( j > 0 && (i % 5 == 0)){}
-            //Look right
-            if( j < avemax && (i % 5 == 0)){}
-        }
+            if( j > 0 && (i % 5 == 0 || i % 2 != 0)){
+                rs = new Road_Segment;
+                rs->type = STREET;
+                rs->number = i;
+                rs->from = tmp[i][j];
+                rs->to = tmp[i-1][j];
 
+                tmp[i][j]->adj.push_back(rs);
+            }
+            //Look right
+            if( j < avemax && (i % 5 == 0 || i % 2 == 0)){
+                rs = new Road_Segment;
+                rs->type = STREET;
+                rs->number = i;
+                rs->from = tmp[i][j];
+                rs->to = tmp[i][j+1];
+
+                tmp[i][j]->adj.push_back(rs);
+            }
+        }
+    }
 
 
 }
