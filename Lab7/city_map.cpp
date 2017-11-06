@@ -15,12 +15,11 @@ City_Map::City_Map(){
     double x, y, gStr, gAve;
     int st, ave;
     int count = 0;
-    int stmax, avemax;
+    int stmax = 0;
+    int avemax = 0;
     while(cin >> st){
         {
-       // cout << count++;
         IS = new Intersection;
-        //cout << "HERE";
         cin >> ave >> x >> y >> gStr >> gAve;
         IS->street = st;
         IS->avenue = ave;
@@ -40,13 +39,24 @@ City_Map::City_Map(){
         all.push_back(IS);
         }
     }
+
     //set initial size of temp vector
     vector< vector<Intersection *> > tmp(stmax +1, vector<Intersection *>(avemax+1));
 
-    //Store contents of all into temp in proper position
-        for(list<Intersection *>::iterator itr = all.begin(); itr !=  all.end(); itr++)
+    //Store contents of all into tmp in proper position
+        for(list<Intersection *>::iterator itr = all.begin(); itr !=  all.end(); itr++){
+            cout << (*itr)->street << " " << (*itr)->avenue;
             tmp[(*itr)->street][(*itr)->avenue] = *itr;
+            cout << endl;
+        }
 
+    for(int i = 0; i < tmp.size(); i++){
+        for(int j = 0; j < tmp[i].size(); j++){
+            cout << tmp[i][j]->street << " " << tmp[i][j]->avenue << endl;
+
+        }
+    }
+/*
     Road_Segment* rs;
     for(int i = 0; i < stmax; i++){
         for(int j = 0; j < avemax; i++){
@@ -93,7 +103,7 @@ City_Map::City_Map(){
         }
     }
 
-
+*/
 }
 
 double City_Map::Dijkstra(int avg_best_worst){
