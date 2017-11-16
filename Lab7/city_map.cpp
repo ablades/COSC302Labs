@@ -1,6 +1,7 @@
 /*Audaris Blades
  * Lab 7
- * Dijkstra's Algorithm
+ * Dijkstra's Algorithm -
+ * Breadth First Search Traversal
  */
 
 #include "city_map.h"
