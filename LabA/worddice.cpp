@@ -2,8 +2,9 @@
  * Lab A
  * Network Flow with words
  */
-
+#include <iostream>
 #include <vector>
+#include <string>
 using namespace std;
 
 class Edge{
@@ -19,9 +20,9 @@ class Edge{
 class Node{
     int id;
     enum type{
-        SINK, SOURCE, DICE, LETTER
+        SOURCE, DICE, LETTER, SINK
     };
-    vector<bool> letters;
+    vector<bool> letters (26, false);
     vector<Edge *> adj;
     //Network Flow
     Edge* backEdge;
@@ -49,5 +50,35 @@ bool Graph::canSpell(){
 }
 
 void Graph::deleteLetterNode(){
-    
+
+}
+
+int main(){
+    Graph graph;
+    String dice;
+    Node* n;
+    int id = 0;
+
+    //Read in data create graph
+    //Read in Dice
+    while(!cin.eof){
+        n = new Node;
+        id++;
+        getline(cin, dice);
+        n->id = id;
+
+        //set letters vector
+        for(int i = 0; i < dice.size(); i++){
+            int pos = dice[i] - 'A';
+            n->letters[pos] = true;
+        }
+
+
+    }
+
+    //Create Nodes and adj list
+    Node n;
+    n.SOURCE;
+
+
 }
