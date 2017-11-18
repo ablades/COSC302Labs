@@ -6,6 +6,8 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <queue>
+
 using namespace std;
 
 class Edge{
@@ -47,6 +49,7 @@ class Node{
         vector<Edge *> adj;
         Type type;
         //Network Flow
+    //What edge got me here
         Edge* backEdge;
         int visited;
         //Constructor
@@ -62,20 +65,93 @@ class Graph{
         bool bfs();
         bool canSpell();
         //Removes half of graph
-        void deleteLetterNode();
+        void deleteLetterNodes();
 };
 
 
 bool Graph::bfs(){
+    //follow paths with an original equal to 1
+    queue<int> q;
+    q.push(SOURCE);
+    while(q.size()){
+        //pop off queue
+        int node = q.front();
+        q.pop();
+        nodes[node]->visited = true;
+
+        //if not the sink and not visited add to queue dd adj edges to queue
+        if(nodes[node]->type != SINK){
+            Edge* e;
+            Node* nextNode;
+            //loop through nodes adj list
+            for(int i = 0; i < nodes[node]->adj.size(); i++){
+                nextNode = nodes[node]->adj[i]->to;
+                e = nodes[node]->adj[i];
+                //Add next node to queue
+                if(!nextNode->visited){
+                    //Set its backedge
+                    nextNode->backEdge = e->reverse;
+                    q.push(nextNode->id);
+                }
+            }
+        }
+        else
+            return true;//path found
+
+    }
     return false;
 }
 
 bool Graph::canSpell(){
+    //Reset BackEdges
+    for(int i = 0; i < nodes.size(); i++)
+        nodes[i]->backEdge = NULL;
+    //Call BFS
+    //When the bfs find a path
+    while(bfs()){
+        //follow back edges
+        Node* n = nodes.back();
+        //Traverse Backedges till source
+        while(n->type != SOURCE){
+            n->backEdge->original = 0;
+            n->backEdge->residual = 1;
+            n->backEdge->reverse->residual = 0;
+            n->backEdge->reverse->residual = 1;
+            n = n->backEdge->from;
+        }
+    }
+
+    //Loop through letters and look at residual value
+    for(int i = minNodes + 1; i < nodes.size(); i++){
+        for(int j = 0; j < nodes[i]->adj.size(); j++){
+            //Look at edge connected to sink
+            if(nodes[i]->adj[j]->to->type == SINK){
+                if(nodes[i]->adj[j]->residual != 1)
+                    return false;
+            }
+        }
+    }
+    return true;
 
 }
 
-void Graph::deleteLetterNode(){
+void Graph::deleteLetterNodes(){
+    //Print out Node Structure
+    for(int i = 0; i < nodes.size(); i++){
+        Node * n = nodes[i];
+        cout << "Node " << n->id << ": " << n->type << " Edges to ";
+        for(int j = 0; j < n->adj.size(); j++){
+            cout << " " << n->adj[j]->to->id;
+        }
+        cout << endl;
+    }
+    cout << endl;
 
+    //Reset second half of vector for next word
+    nodes.erase(nodes.begin() + minNodes + 1, nodes.end());
+    //Reset adjList
+    for(int i = 1; i <= minNodes; i++)
+        nodes[i]->adj.clear();
 }
 
 int main(int argc, char *argv[]){
@@ -106,9 +182,10 @@ int main(int argc, char *argv[]){
         //Read in Dice
         n = new Node;
         edge = new Edge(source, n);
+        //SET WORD BACK EDGE
+       // n->backEdge = edge->reverse;
         //Add Word t0 source
         source->adj.push_back(edge);
-        n->backEdge = edge;
         id++;
         n->id = id;
 
@@ -127,12 +204,12 @@ int main(int argc, char *argv[]){
     file.clear();
     //THIS IS THE START OF THE LOOP
     //Read in Words
-    cout << id;
+    graph.minNodes = id;
     string word;
     file.open(wordFile.c_str());
     while(getline(file, word)){
      //   id++;
-        n->id = id;
+        n->id = graph.minNodes;
 
         //Create node for each letter of the word
         for(int i = 0; i < word.size(); i++){
@@ -142,20 +219,23 @@ int main(int argc, char *argv[]){
             int pos = word[i] - 'A';
           //  cout << id;
             n->letters[pos] = true;
-            //Loop through and set edges
-            for(int j = 1; j <= id; j++){
+            //Loop through words and set edges
+            for(int j = 1; j <= graph.minNodes; j++){
                 if(graph.nodes[j]->letters[pos] == true){
                     //cout <<" found edge for " << word[i] << " at "  << j << endl;
                     //Create Edge from Word Node to Letter Node
                     edge = new Edge(graph.nodes[j], n);
                     //add to adj list
                     graph.nodes[j]->adj.push_back(edge);
+                    //Add reverse edge to letters adj list
+                    n->adj.push_back(edge->reverse);
 
                 }
             }
             //For each letter create an edge from node to sink
             edge = new Edge(n, sink);
-            n->backEdge = edge;
+            //SET SINK BACK EDGE
+           // sink->backEdge = edge->reverse;
             //Add to adj list
             n->adj.push_back(edge);
             graph.nodes.push_back(n);
@@ -164,23 +244,10 @@ int main(int argc, char *argv[]){
         sink->id = graph.nodes.size();
         graph.nodes.push_back(sink);
 
-        for(int i = 0; i < graph.nodes.size(); i++){
-            Node * n = graph.nodes[i];
-            cout << "Node " << n->id << ": " << n->type << " Edges to ";
-            for(int j = 0; j < n->adj.size(); j++){
-                cout << " " << n->adj[j]->to->id;
-            }
-            cout << endl;
-        }
-        cout << endl;
-
-
-
-        //Reset second half of vector for next word
-        graph.nodes.erase(graph.nodes.begin() + id + 1, graph.nodes.end());
-        //Reset adjList
-        for(int i = 1; i <graph.nodes.size(); i++)
-            graph.nodes[i]->adj.clear();
+        //can spell check
+        graph.canSpell();
+        //Reset Letters
+        graph.deleteLetterNodes();
 
     }
     file.close();
