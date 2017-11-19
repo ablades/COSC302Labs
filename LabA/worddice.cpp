@@ -7,6 +7,7 @@
 #include <string>
 #include <fstream>
 #include <queue>
+#include <map>
 
 using namespace std;
 
@@ -60,7 +61,8 @@ class Graph{
     public:
         vector<Node*> nodes;
         //Node id for words
-        vector<int> spellingIDs;
+        //stores word id at letter id index
+        map<int, int> sid;
         int minNodes;
         bool bfs();
         bool canSpell();
@@ -73,6 +75,7 @@ class Graph{
 bool Graph::bfs(){
     //follow paths with an original equal to 1
     //Reset bfs
+  //  cout << "RESET";
      for(int i = 0; i < nodes.size(); i++){
         nodes[i]->visited = false;
       nodes[i]->backEdge = NULL;
@@ -96,7 +99,7 @@ bool Graph::bfs(){
         for(int i = 0; i < nodes[node]->adj.size(); i++){
             nextNode = nodes[node]->adj[i]->to;
             e = nodes[node]->adj[i];
-       //     cout << "Current Node " << node << " Next Node " << nextNode->id << endl;
+    //        cout << "Current Node " << node << " Next Node " << nextNode->id << endl;
             //Add next node to queue
             if(!nextNode->visited && e->original == 1){
                 //Set its backedge
@@ -125,13 +128,23 @@ bool Graph::canSpell(){
     while(bfs() == true){
        //follow back edges//Traverse Back edges till source
         Node* n = nodes.back();
+        int x;
         while(n->type != SOURCE){
-            cout << "backTrav" << endl;
+       //     cout << "backTrav" << endl;
             n->backEdge->original = 1;
             n->backEdge->residual = 0;
             n->backEdge->reverse->residual = 1;
             n->backEdge->reverse->original = 0;
-            cout << "ID : " << n->backEdge->to->id << endl;
+  //          cout << "ID : " << n->backEdge->to->id << endl;
+            if(n->type == LETTER){
+                x = n->id;
+             //   cout << "LETTER: " << x;
+            }
+
+            if(n->type == DICE){
+                sid[x] = n->id;
+            //    cout << " DICE " << n->id << endl;
+            }
             n = n->backEdge->to;
         }
     }
@@ -169,7 +182,7 @@ void Graph::deleteLetterNodes(){
         nodes[0]->adj[i]->reverse->original = 0;
         nodes[0]->adj[i]->reverse->residual = 1;
     }
-
+    sid.clear();
     //Reset second half of vector for next word
     nodes.erase(nodes.begin() + minNodes + 1, nodes.end());
     //Reset adjList
@@ -210,6 +223,7 @@ int main(int argc, char *argv[]){
         source->adj.push_back(edge);
         id++;
         n->id = id;
+       // cout << n->id;
 
         //set letters vector
         for(int i = 0; i < dice.size(); i++){
@@ -235,9 +249,10 @@ int main(int argc, char *argv[]){
 
         //Create node for each letter of the word
         for(int i = 0; i < word.size(); i++){
-            cout << "WORD : "  << word << endl;
+       //     cout << "WORD : "  << word << endl;
             n = new Node;
             n->id = id + i  + 1;
+         //   cout << n->id;
             n->type = LETTER;
             int pos = word[i] - 'A';
           //  cout << id;
@@ -258,7 +273,7 @@ int main(int argc, char *argv[]){
             //For each letter create an edge from node to sink
             edge = new Edge(n, sink);
             //SET SINK BACK EDGE
-         //   sink->adj.push_back(edge->reverse);
+           // sink->adj.push_back(edge->reverse);
             //Add to adj list
             n->adj.push_back(edge);
             graph.nodes.push_back(n);
@@ -269,7 +284,20 @@ int main(int argc, char *argv[]){
         graph.nodes.push_back(sink);
 
         //can spell check
-        cout << "CAN WE SPELL " <<graph.canSpell() <<endl;
+        if(graph.canSpell() == true){
+            //Loop through letters and look at residual value
+            for (std::map<int,int>::iterator it=graph.sid.begin(); it!=graph.sid.end(); ++it){
+                if(it == graph.sid.begin())
+                    cout << it->second - 1;
+                else
+                    cout << "," << it->second - 1;
+            }
+            cout << ": "  << word ;
+
+        }else{
+            cout << "Cannot spell " << word;
+        }
+        cout << endl;
         //Reset Letters
         graph.deleteLetterNodes();
 
