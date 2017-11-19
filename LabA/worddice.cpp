@@ -32,7 +32,7 @@ class Edge{
             re->from = t;
             re->to = from;
             re->original = 0;
-            re->residual = 1;
+            re->residual = 1    ;
             //Set Each others reverse edges
             re->reverse = this;
             reverse = re;
@@ -72,6 +72,12 @@ class Graph{
 
 bool Graph::bfs(){
     //follow paths with an original equal to 1
+    //Reset bfs
+     for(int i = 0; i < nodes.size(); i++){
+        nodes[i]->visited = false;
+      nodes[i]->backEdge = NULL;
+    }
+
     queue<int> q;
     q.push(SOURCE);
     while(q.size()){
@@ -90,51 +96,44 @@ bool Graph::bfs(){
         for(int i = 0; i < nodes[node]->adj.size(); i++){
             nextNode = nodes[node]->adj[i]->to;
             e = nodes[node]->adj[i];
-            cout << "Current Node " << node << " Next Node " << nextNode->id << endl;
+       //     cout << "Current Node " << node << " Next Node " << nextNode->id << endl;
             //Add next node to queue
             if(!nextNode->visited && e->original == 1){
                 //Set its backedge
-                cout << "BackEdge of " << nextNode->id << "Set to" << e->reverse->to->id << endl;
+         //       cout << "BackEdge of " << nextNode->id << "Set to" << e->reverse->to->id << endl;
                 nextNode->backEdge = e->reverse;
+                q.push(nextNode->id);
                 if(nextNode->type == SINK)
-                    backTraversal(); //return true;
-                else
-                    q.push(nextNode->id);
+                    return true; //return true;
+
             }
         }
     }
     return false;
 }
 
-void Graph::backTraversal(){
-    //follow back edges
-    Node* n = nodes.back();
-    cout << "canISpell" << endl;
-    //  Node* n = nodes[node];
-    if(n->backEdge->residual == 1){
-    while(n->type != SOURCE){
-        cout << "backTrav" << endl;
-        n->backEdge->original = 1;
-        n->backEdge->residual = 0;
-        n->backEdge->reverse->residual = 1;
-        n->backEdge->reverse->original = 0;
-        cout << "ID : " << n->backEdge->to->id << endl;
-        n = n->backEdge->to;
-    }}
-
-}
 
 bool Graph::canSpell(){
     //Reset BackEdges
-    for(int i = 0; i < nodes.size(); i++){
-        nodes[i]->visited = false;
-        nodes[i]->backEdge = NULL;
-    }
+  //  for(int i = 0; i < nodes.size(); i++){
+    //    nodes[i]->visited = false;
+      //  nodes[i]->backEdge = NULL;
+    //}
     //Call BFS
     //When the bfs find a path
-    while(bfs()){
-        //follow back edges
-        //Traverse Back edges till source
+    Node* n = nodes.back();
+    while(bfs() == true){
+       //follow back edges//Traverse Back edges till source
+        Node* n = nodes.back();
+        while(n->type != SOURCE){
+            cout << "backTrav" << endl;
+            n->backEdge->original = 1;
+            n->backEdge->residual = 0;
+            n->backEdge->reverse->residual = 1;
+            n->backEdge->reverse->original = 0;
+            cout << "ID : " << n->backEdge->to->id << endl;
+            n = n->backEdge->to;
+        }
     }
 
     //Loop through letters and look at residual value
@@ -153,7 +152,7 @@ bool Graph::canSpell(){
 
 void Graph::deleteLetterNodes(){
     //Print out Node Structure
-    for(int i = 0; i < nodes.size(); i++){
+  /*  for(int i = 0; i < nodes.size(); i++){
         Node * n = nodes[i];
         cout << "Node " << n->id << ": " << n->type << " Edges to ";
         for(int j = 0; j < n->adj.size(); j++){
@@ -161,7 +160,15 @@ void Graph::deleteLetterNodes(){
         }
         cout << endl;
     }
-    cout << endl;
+    cout << endl;*/
+    nodes.back()->adj.clear();
+
+    for(int i = 0; i < nodes[0]->adj.size();i++){
+        nodes[0]->adj[i]->original = 1;
+        nodes[0]->adj[i]->residual = 0;
+        nodes[0]->adj[i]->reverse->original = 0;
+        nodes[0]->adj[i]->reverse->residual = 1;
+    }
 
     //Reset second half of vector for next word
     nodes.erase(nodes.begin() + minNodes + 1, nodes.end());
@@ -251,7 +258,7 @@ int main(int argc, char *argv[]){
             //For each letter create an edge from node to sink
             edge = new Edge(n, sink);
             //SET SINK BACK EDGE
-           // sink->backEdge = edge->reverse;
+         //   sink->adj.push_back(edge->reverse);
             //Add to adj list
             n->adj.push_back(edge);
             graph.nodes.push_back(n);
@@ -262,7 +269,7 @@ int main(int argc, char *argv[]){
         graph.nodes.push_back(sink);
 
         //can spell check
-        cout << "CAN WE SPELL " <<graph.canSpell();
+        cout << "CAN WE SPELL " <<graph.canSpell() <<endl;
         //Reset Letters
         graph.deleteLetterNodes();
 
